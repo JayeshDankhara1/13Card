@@ -9,6 +9,8 @@ public class GamePlayUiManager : MonoBehaviour
 
 
     public TextMeshProUGUI CounDowan_Text;
+
+    public List <Sprite> Card_Sprite = new List <Sprite>();
     // Start is called before the first frame update
     void Start()
     {
