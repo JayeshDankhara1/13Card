@@ -16,7 +16,12 @@ public class GamePlayUiManager : MonoBehaviour
     public List <GameObject>Card_GameObjects = new List<GameObject>();
 
 
+    public GameObject Pref_GameObject;
     
+    public Transform Parent1_GameObject;
+    public Transform Parent2_GameObject;
+    public Transform Parent3_GameObject;
+
 
     public static GamePlayUiManager Instance;
     public GamePlayManager Ref_GamePlayManager;
@@ -46,16 +51,7 @@ public class GamePlayUiManager : MonoBehaviour
     {
         CounDowan_Text.gameObject.SetActive(IsActive);
     }
-    public void LoadCard()
-    {
-        ActiveCard();
-        for (int i = 0; i < Card_Image.Count; i++)
-        {
-            Card_Image[i].sprite = Card_Sprite[GetCardIndex(Ref_GamePlayManager.cards[i])];
-            cards[i].Name = Ref_GamePlayManager.cards[i].Name;
-            cards[i].Color = Ref_GamePlayManager.cards[i].Color;
-        }
-    }
+    
 
 
     public int GetCardIndex(Card card)
@@ -79,12 +75,32 @@ public class GamePlayUiManager : MonoBehaviour
        // GetCard();
     }
 
-    public void GetCard()
+    public void CreatCard()
     {
-        for (int i = 0; i < Card_GameObjects.Count; i++)
-        {
-            cards[i] = Card_GameObjects[i].GetComponent<Card>();
-        }
+        GameObject TempGameObject = Instantiate(Pref_GameObject, Parent1_GameObject);
+        
+        LoadSprit(TempGameObject, LoadRendomCard(TempGameObject));
+
+        Card_GameObjects.Add(TempGameObject);
+
     }
 
+    
+    public void LoadSprit(GameObject gameObject, Card card)
+    {
+        gameObject.GetComponent<Image>().sprite = Card_Sprite[GetCardIndex(card)];
+    }
+
+    public Card LoadRendomCard(GameObject gameObject)
+    {
+            
+        Card card = gameObject.GetComponent<Card>();
+        card.Color = (Color)Random.Range(0, 4);
+        card.Name = (Name)Random.Range(0, 13);
+        return card;
+        //cards[i].Name = (Name)Random.Range(0, 13) ;
+        //cards[i].Color =(Color)Random.Range(0, 4);
+        //Card_Image[i].sprite = Card_Sprite[GetCardIndex(cards[i])];
+
+    }
 }

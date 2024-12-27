@@ -1,19 +1,30 @@
 
-
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
+
+
+public enum Result 
+{
+    HighCard=500,
+    Pair=1000,
+    TwoPairs=2000,
+    ThreeOfaKind=4000,
+    Straight=6000, 
+    Flush=7000,
+    FullHouse=8000,
+    FourOfaKind=9000,
+    StraightFlush=12000,
+    RoyalFlush=15000
+} 
+
 
 public class GamePlayManager : MonoBehaviour
 {
 
     public GamePlayUiManager Ref_GamePlayUiManager;
+    [SerializeField]
     public List<Card> cards = new List<Card>();
     public List<Card> cards1 = new List<Card>();
     public List<Card> cards2 = new List<Card>();
@@ -58,7 +69,7 @@ public class GamePlayManager : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         Ref_GamePlayUiManager.CounDowan(false);
-        Ref_GamePlayUiManager.LoadCard();
+      //  Ref_GamePlayUiManager.LoadCard();
 
     }
 
@@ -238,43 +249,45 @@ public class GamePlayManager : MonoBehaviour
         }
         return pairCount == 2;
     }
-    public bool HighCard(List<Card> cards)
+
+    public bool Pair(List<Card> cards)
     {
-            return true;
+       return false;
     }
 
-    public List<Card> Sort(List<Card> cards)
-    {
-        if (cards == null) return null;
-        for (int i = 0; i < cards.Count-1; i++)
-        {
-            for (int j = i + 1; j < cards.Count; j++)
-            {
-                if (GetValue(cards[j].Name) > GetValue(cards[i].Name))
-                {
-                    Card TempCard = new Card(cards[j].Color, cards[j].Name);
-                    cards[j] = cards[i];
-                    cards[i] = TempCard;
-                }
-            }
-        }
-            return cards;
-    }
+   
+    //public List<Card> Sort(List<Card> cards)
+    //{
+    //    if (cards == null) return null;
+    //    for (int i = 0; i < cards.Count-1; i++)
+    //    {
+    //        for (int j = i + 1; j < cards.Count; j++)
+    //        {
+    //            if (GetValue(cards[j].Name) > GetValue(cards[i].Name))
+    //            {
+    //                Card TempCard = new Card(cards[j].Color, cards[j].Name);
+    //                cards[j] = cards[i];
+    //                cards[i] = TempCard;
+    //            }
+    //        }
+    //    }
+    //        return cards;
+    //}
 
-    public void CreatCard(Color color, Name name)
-    {
-        Card TempCard = new Card(color,name);
+    //public void CreatCard(Color color, Name name)
+    //{
+    //    Card TempCard = new Card(color,name);
 
-        if (!cards.Any())
-        {
-            cards.Add(TempCard);
-        }
-        else if (!FindEliment(TempCard, cards))
-        {
-         cards.Add(TempCard);
-           return;
-        }
-    }
+    //    if (!cards.Any())
+    //    {
+    //        cards.Add(TempCard);
+    //    }
+    //    else if (!FindEliment(TempCard, cards))
+    //    {
+    //     cards.Add(TempCard);
+    //       return;
+    //    }
+    //}
 
     public bool FindEliment(Card card,List<Card> cards)
     {
@@ -288,18 +301,18 @@ public class GamePlayManager : MonoBehaviour
     public void CreatList()
     {
 
-        cards.Clear();
+        //cards.Clear();
         // int CardName = 0;
         // int ColorIndx = 0;
        
-       while(cards.Count<13)
+       //while(cards.Count<13)
        {
              int ColorIndx =Random.Range(0, 4);
              int CardName = Random.Range(0, 13);
 
             
             
-            CreatCard((Color)ColorIndx, (Name)CardName);
+          //  CreatCard((Color)ColorIndx, (Name)CardName);
 
             /* CardName++;
              if (CardName == 12)
@@ -309,7 +322,7 @@ public class GamePlayManager : MonoBehaviour
              }*/
            
       }
-        PartList();
+       // PartList();
     }
 
     public void PartList()
@@ -332,57 +345,58 @@ public class GamePlayManager : MonoBehaviour
                 cards3.Add(cards[i]);
             }
         }
-        AllListSort();
+       // AllListSort();
     }
-    public void AllListSort()
-    {
-
-        cards1 = Sort(cards1);
-         cards2 = Sort(cards2);
-        cards3 = Sort(cards3);
-
-    }
+  
 
     public void test()
     {
         
        
-        Result(cards1);
-        Result(cards2);
-        Result(cards3);
+       // Result(cards1);
+       // Result(cards2);
+        //Result(cards3);
     }
-    public void Result(List<Card> cards)
+    public Result TestResult(List<Card> cards)
     {
-        if (RoyalFlush(cards)) {
-            Debug.Log("RoyalFlush");
-        }
-        else if (StraightFlush(cards)) {
-            Debug.Log("StraightFlush");
-        }
-        else if (FourOfaKind(cards)) {
-            Debug.Log("FourOfaKind");
-        }
-        else if (FullHouse(cards)) {
-            Debug.Log("FullHouse");
-        }
-        else if (Flush(cards)) 
+        if (RoyalFlush(cards))
         {
-            Debug.Log("Flush");        
+            return Result.RoyalFlush;
         }
-        else if (Straight(cards)) 
+        else if (StraightFlush(cards))
         {
-            Debug.Log("Straight");
+            return Result.StraightFlush;
         }
-        else if (ThreeOfaKind(cards)) {
-            Debug.Log("ThreeOfaKind");
+        else if (FourOfaKind(cards))
+        {
+            return Result.FourOfaKind;
         }
-        else if (TwoPairs(cards)) {
-            Debug.Log("TwoPairs");
+        else if (FullHouse(cards))
+        {
+            return Result.FullHouse;
         }
-        else if (HighCard(cards)) {
-            Debug.Log("HighCard");
+        else if (Flush(cards))
+        {
+            return Result.Flush;
         }
-
+        else if (Straight(cards))
+        {
+            return Result.Straight;
+        }
+        else if (ThreeOfaKind(cards))
+        {
+            return Result.ThreeOfaKind;
+        }
+        else if (TwoPairs(cards))
+        {
+            return Result.TwoPairs;
+        }
+        else if (Pair(cards))
+        { 
+            return Result.Pair;   
+        }
+        else
+            return Result.HighCard; 
 
     }
   
