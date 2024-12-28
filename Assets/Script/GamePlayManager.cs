@@ -44,7 +44,7 @@ public class GamePlayManager : MonoBehaviour
     public void Start()
     {
         StartCoroutine(GameStart());
-        CreatList();
+    
     }
 
     // Update is called once per frame
@@ -69,6 +69,7 @@ public class GamePlayManager : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         Ref_GamePlayUiManager.CounDowan(false);
+        Ref_GamePlayUiManager.LoadCard();
       //  Ref_GamePlayUiManager.LoadCard();
 
     }
@@ -289,15 +290,7 @@ public class GamePlayManager : MonoBehaviour
     //    }
     //}
 
-    public bool FindEliment(Card card,List<Card> cards)
-    {
-        for (int i = 0; i < cards.Count; i++)
-        {
-            if (cards[i].Color == card.Color && cards[i].Name== card.Name)
-            return true;
-        }
-        return false;
-    }
+ 
     public void CreatList()
     {
 
