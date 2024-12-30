@@ -35,6 +35,7 @@ public class GamePlayManager : MonoBehaviour
 
     public bool IsTrigar = false;
     public GameObject Collide_GameObject;
+    public Vector3 Collide_GameObject_Postion;
     // Start is called before the first frame update
 
     public void Awake()

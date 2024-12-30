@@ -15,7 +15,7 @@ public class GamePlayUiManager : MonoBehaviour
    // public List<Image> Card_Image = new List <Image>();
     public List<Card> cards = new List<Card>();
     public List <GameObject>Card_GameObjects = new List<GameObject>();
-    public Card TempCard;
+    public HorizontalLayoutGroup HorizontalLayoutGroup;
 
 
     public GameObject Pref_GameObject;
@@ -125,14 +125,8 @@ public class GamePlayUiManager : MonoBehaviour
 
     public Card LoadRendomCard()
     {
-       
-        TempCard.Color = (Color)Random.Range(0, 4);
-        TempCard.Name = (Name)Random.Range(0, 13);
-
-        
-        //Card card =new Card(color, name);
-       // Card card = gameObject.GetComponent<Card>();
-        return TempCard;
+       Card card = new Card((Color)Random.Range(0, 4), (Name)Random.Range(0, 13));
+        return card;
 
     }
     public Card GetCard(GameObject gameObject)
@@ -162,12 +156,11 @@ public class GamePlayUiManager : MonoBehaviour
        
         if (!cards.Any())
         {
-            Debug.Log("FastCard Creat List");
             cards.Add(card);
         }
         else if (!FindEliment(card, cards))
         {
-            Debug.Log("SecoundCard Creat List");
+            
             cards.Add(card);
             return;
         }
@@ -189,5 +182,19 @@ public class GamePlayUiManager : MonoBehaviour
         CreatCardList();
         CreatCard_GameObjectList();
     }
+
+    public void CardListUpdate()
+    {
+       // transform.SetParent
+
+    }
+    
+    public void LayOutGroupFalse()
+    {
+        
+
+
+    }
+    
 
 }

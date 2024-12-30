@@ -35,11 +35,11 @@ public class Card : MonoBehaviour
     public Color Color;
     public Name Name;
 
-   //public Card(Color color, Name name)
-   //{
-   //     this.Color = color;
-   //     this.Name = name;
-   //}
+   public Card(Color color, Name name)
+   {
+        this.Color = color;
+        this.Name = name;
+   }
 
    // public void SetCard(Color color, Name name)
    // {
