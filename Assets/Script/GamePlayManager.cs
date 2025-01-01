@@ -24,12 +24,6 @@ public class GamePlayManager : MonoBehaviour
 {
 
     public GamePlayUiManager Ref_GamePlayUiManager;
-    [SerializeField]
-    public List<Card> cards = new List<Card>();
-    public List<Card> cards1 = new List<Card>();
-    public List<Card> cards2 = new List<Card>();
-    public List<Card> cards3 = new List<Card>();
-
 
     public static GamePlayManager instance;
 
@@ -75,6 +69,9 @@ public class GamePlayManager : MonoBehaviour
         }
         Ref_GamePlayUiManager.CounDowan(false);
         Ref_GamePlayUiManager.LoadCard();
+        Ref_GamePlayUiManager.AllCardListUpdate();
+
+        
       //  Ref_GamePlayUiManager.LoadCard();
 
     }
@@ -137,6 +134,7 @@ public class GamePlayManager : MonoBehaviour
 
     public bool RoyalFlush(List<Card> cards)
     {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         if (StraightFlush(cards) && cards[0].Name == Name.Ace && cards[cards.Count - 1].Name == Name.King)
         {
             return true;
@@ -146,6 +144,7 @@ public class GamePlayManager : MonoBehaviour
     }
     public bool StraightFlush(List<Card> cards)
     {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         if (Flush(cards) && Straight(cards))
         {
             return true;
@@ -175,6 +174,7 @@ public class GamePlayManager : MonoBehaviour
    
     public bool FullHouse(List<Card> cards)
     {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         var groupedCards = cards.GroupBy(c => c.Name);
 
         bool hasThree = ThreeOfaKind(cards);
@@ -229,7 +229,8 @@ public class GamePlayManager : MonoBehaviour
 
     public bool ThreeOfaKind(List<Card> cards)
     {
-            var groupedCards = cards.GroupBy(c => c.Name);
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        var groupedCards = cards.GroupBy(c => c.Name);
 
         foreach (var group in groupedCards)
         {
@@ -242,7 +243,8 @@ public class GamePlayManager : MonoBehaviour
        
     }
     public bool TwoPairs(List<Card> cards)
-    {    
+    {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         var groupedCards = cards.GroupBy(c => c.Name);      
         int pairCount = 0;
 
@@ -258,103 +260,24 @@ public class GamePlayManager : MonoBehaviour
 
     public bool Pair(List<Card> cards)
     {
-       return false;
-    }
 
-   
-    //public List<Card> Sort(List<Card> cards)
-    //{
-    //    if (cards == null) return null;
-    //    for (int i = 0; i < cards.Count-1; i++)
-    //    {
-    //        for (int j = i + 1; j < cards.Count; j++)
-    //        {
-    //            if (GetValue(cards[j].Name) > GetValue(cards[i].Name))
-    //            {
-    //                Card TempCard = new Card(cards[j].Color, cards[j].Name);
-    //                cards[j] = cards[i];
-    //                cards[i] = TempCard;
-    //            }
-    //        }
-    //    }
-    //        return cards;
-    //}
 
-    //public void CreatCard(Color color, Name name)
-    //{
-    //    Card TempCard = new Card(color,name);
-
-    //    if (!cards.Any())
-    //    {
-    //        cards.Add(TempCard);
-    //    }
-    //    else if (!FindEliment(TempCard, cards))
-    //    {
-    //     cards.Add(TempCard);
-    //       return;
-    //    }
-    //}
-
- 
-    public void CreatList()
-    {
-
-        //cards.Clear();
-        // int CardName = 0;
-        // int ColorIndx = 0;
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        var groupedCards = cards.GroupBy(c => c.Name);
        
-       //while(cards.Count<13)
-       {
-             int ColorIndx =Random.Range(0, 4);
-             int CardName = Random.Range(0, 13);
 
-            
-            
-          //  CreatCard((Color)ColorIndx, (Name)CardName);
-
-            /* CardName++;
-             if (CardName == 12)
-             {
-                 CardName = 0;
-                 ColorIndx++;
-             }*/
-           
-      }
-       // PartList();
-    }
-
-    public void PartList()
-    {
-        cards1.Clear();
-        cards2.Clear();
-        cards3.Clear();
-        for (int i = 0; i < 13; i++)
+        foreach (var group in groupedCards)
         {
-            if (i < 5)
+            if (group.Count() == 2)
             {
-                cards1.Add(cards[i]);
-            }
-            else if (i < 10)
-            {
-                cards2.Add(cards[i]);
-            }
-            else
-            {
-                cards3.Add(cards[i]);
+                return true;
             }
         }
-       // AllListSort();
+        return false;
     }
-  
 
-    public void test()
-    {
-        
-       
-       // Result(cards1);
-       // Result(cards2);
-        //Result(cards3);
-    }
+
+
     public Result TestResult(List<Card> cards)
     {
         if (RoyalFlush(cards))
@@ -396,6 +319,14 @@ public class GamePlayManager : MonoBehaviour
         else
             return Result.HighCard; 
 
+    }
+
+
+    public void ShowResult()
+    {
+        Ref_GamePlayUiManager.SetResult1_Text(TestResult(Ref_GamePlayUiManager.List1Call()).ToString());
+        Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
+        Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());
     }
   
 }

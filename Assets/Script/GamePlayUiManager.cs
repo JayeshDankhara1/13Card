@@ -15,7 +15,15 @@ public class GamePlayUiManager : MonoBehaviour
    // public List<Image> Card_Image = new List <Image>();
     public List<Card> cards = new List<Card>();
     public List <GameObject>Card_GameObjects = new List<GameObject>();
-    public HorizontalLayoutGroup HorizontalLayoutGroup;
+    
+    public List <Card> Card_List1 = new List<Card>();
+    public List<Card> Card_List2 = new List<Card>();
+    public List<Card> Card_List3 = new List<Card>();
+
+    public TextMeshProUGUI Result1_Text;
+    public TextMeshProUGUI Result2_Text;
+    public TextMeshProUGUI Result3_Text;
+
 
 
     public GameObject Pref_GameObject;
@@ -181,20 +189,131 @@ public class GamePlayUiManager : MonoBehaviour
     {
         CreatCardList();
         CreatCard_GameObjectList();
+        
     }
 
-    public void CardListUpdate()
-    {
-       // transform.SetParent
-
-    }
-    
-    public void LayOutGroupFalse()
+    public Card Find_Card(Transform transform , int Index)
     {
         
 
+        return transform.GetChild(Index).GetComponent<Card>(); 
+    }
+
+    public GameObject Find_GameObject(Transform transform, int Index)
+    {
+        return transform.GetChild(Index).gameObject;
+    }
+
+    public void List1Update()
+    {
+        Card_List1.Clear();
+
+        for (int i = 0; i < 5; i++)
+        {
+            Card_List1.Add(Find_Card(Parent1_GameObject, i));
+        }
+    }
+
+    public void List2Update()
+    {
+        Card_List2.Clear();
+
+        for (int i = 0; i < 5; i++)
+        {
+            Card_List2.Add(Find_Card(Parent2_GameObject, i));
+        }
+    }
+    public void List3Update()
+    {
+        Card_List3.Clear();
+
+        for (int i = 0; i < 3; i++)
+        {
+            Card_List3.Add(Find_Card(Parent3_GameObject, i));
+        }
+    }
+
+    public void AllCardListUpdate()
+    {
+        List1Update();
+        List2Update();
+        List3Update();
+        Ref_GamePlayManager.ShowResult();
+       
+    }
+
+
+    public List<Card> List1Call()
+    {
+        return Card_List1;
+    }
+
+    public List<Card> List2Call()
+    {
+        return Card_List2;
+    }
+    public List<Card> List3Call()
+    {
+        return Card_List3;
+    }
+
+    public void SetResult1_Text(string text)
+    { 
+        Result1_Text.text = text;
+    }
+
+    public void SetResult2_Text(string text)
+    {
+        Result2_Text.text = text;
+    }
+    public void SetResult3_Text(string text)
+    {
+        Result3_Text.text = text;
+    }
+
+    public void SwitchList()
+    {
+        SwapCard(List1Call(), List2Call());
+        Load_Sprit();
+        AllCardListUpdate();
 
     }
-    
 
+
+    public void SwapCard(List<Card> card1, List<Card> card2)
+    {
+
+        for (int i = 0; i < card1.Count; i++)
+        { 
+            Color color = card1[i].Color;
+            Name name = card1[i].Name;
+
+            card1[i].Color = card2[i].Color;
+            card1[i].Name = card2[i].Name;
+
+            card2[i].Color = color;
+            card2[i].Name = name;
+
+
+        }
+       
+    }
+
+    public void Load_Sprit()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            if (i < 5)
+            {
+                LoadSprit(Find_GameObject(Parent1_GameObject,i), Card_List1[i]);
+            }
+            else
+            {
+                LoadSprit(Find_GameObject(Parent2_GameObject, i-5), Card_List2[i-5]);
+            }
+        }
+        
+    }
+
+  
 }

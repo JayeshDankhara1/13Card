@@ -1,10 +1,6 @@
 
 using UnityEngine;
 
-using UnityEngine.UI;
-
-
-
 public class DargeAndDrop : MonoBehaviour
 {
 
@@ -14,7 +10,6 @@ public class DargeAndDrop : MonoBehaviour
     Vector3 CollidGameObjectPostion;
 
     public GamePlayManager Ref_GamePlayManager;
-
 
     public GameObject ThisGameObject=null;
     public GameObject CollidGameObject=null;
@@ -33,12 +28,13 @@ public class DargeAndDrop : MonoBehaviour
     }
 
     public void OnMouseDown()
-    {
+    { 
         IsRaning = true;
         ThisGameObject = transform.gameObject;
         TransformPostion = transform.position;
         HighLiteCard(ThisGameObject.transform, 1.2f);
         MousePostionOffset = gameObject.transform.position - GetMousePostion();
+        transform.gameObject.layer = LayerMask.NameToLayer("DrageCard");
     }
 
     public void OnMouseDrag()
@@ -48,20 +44,21 @@ public class DargeAndDrop : MonoBehaviour
 
     }
 
-
-
-
     public void OnMouseUp()
     {
+        if (ThisGameObject !=null && CollidGameObject!=null)
+        {
+            IsCollide = false;
+            SwapCard_GameObject(ThisGameObject, CollidGameObject,TransformPostion, CollidGameObjectPostion);
+            Ref_GamePlayManager.Ref_GamePlayUiManager.AllCardListUpdate();
+            CollidGameObject = null;
+            ThisGameObject = null;
+        }
         IsRaning = false;
-        // transform.position = TransformPostion;
-        HighLiteCard(ThisGameObject.transform, 1f);
-    }
-
-
-    public void OnTriggerEnter2D(Collider2D collision)
-    {
-        
+        transform.position = TransformPostion;
+        transform.gameObject.layer = LayerMask.NameToLayer("UI");
+      
+        HighLiteCard(transform, 1f);
     }
 
     public void OnTriggerStay2D(Collider2D collision)
@@ -81,29 +78,10 @@ public class DargeAndDrop : MonoBehaviour
         if (IsRaning)
         {
             IsCollide = false;
+            CollidGameObject = null;
             HighLiteCard(collision.gameObject.transform, 1f);
         }
       
-    }
-
-    public void SwapCard(Card card1, Card card2)
-    {
-        Color tempColor = card1.Color;
-        Name tempName = card1.Name;
-
-        card1.Color = card2.Color;
-        card1.Name = card2.Name;
-
-        card2.Color = tempColor;
-        card2.Name = tempName;
-
-    }
-
-
-    public void LoadSprit(GameObject gameObject)
-    {
-        gameObject.GetComponent<Image>().sprite = Ref_GamePlayManager.Ref_GamePlayUiManager.Card_Sprite[Ref_GamePlayManager.Ref_GamePlayUiManager.GetCardIndex(gameObject.GetComponent<Card>())];
-
     }
 
     public void HighLiteCard(Transform transform, float Scale)
@@ -114,23 +92,25 @@ public class DargeAndDrop : MonoBehaviour
     public void SwapCard_GameObject(GameObject gameObject1, GameObject gameObject2, Vector3 gameObject1_Postion, Vector3 gameObject2_Postion)
     {
 
-        Transform parent = gameObject1.transform.parent;
+        Transform parent1 = gameObject1.transform.parent;
+        Transform parent2 = gameObject2.transform.parent;
+
         int siblingIndex1 = gameObject1.transform.GetSiblingIndex();
         int siblingIndex2 = gameObject2.transform.GetSiblingIndex();
 
-
-        //   gameObject1.transform.SetSiblingIndex(-1);
-        //  gameObject2.transform.SetSiblingIndex(-1);
-
+        gameObject1.transform.SetParent(parent2);
+        gameObject2.transform.SetParent(parent1);
 
         gameObject1.transform.SetSiblingIndex(siblingIndex2);
         gameObject2.transform.SetSiblingIndex(siblingIndex1);
 
+        gameObject1.transform.localPosition = gameObject2_Postion;
+        gameObject2.transform.localPosition = gameObject2_Postion;
 
-        LayoutRebuilder.ForceRebuildLayoutImmediate(parent.GetComponent<RectTransform>());
-
+        HighLiteCard(gameObject1.transform,1f);
+        HighLiteCard(gameObject2.transform, 1f);
+        
     }
-
 
 }
 
