@@ -53,9 +53,24 @@ public class DargeAndDrop : MonoBehaviour
 
     public void OnMouseUp()
     {
+        if (ThisGameObject != null && CollidGameObject != null)
+        {
+            SwapCard_GameObject(ThisGameObject, CollidGameObject, TransformPostion, CollidGameObjectPostion);
+            IsCollide = false;
+            ThisGameObject = null;
+            CollidGameObject = null;
+
+        }
+        else { 
+        
+            transform.position = TransformPostion;
+            IsCollide = false;
+            ThisGameObject = null;
+            CollidGameObject = null;
+        }
         IsRaning = false;
-        // transform.position = TransformPostion;
-        HighLiteCard(ThisGameObject.transform, 1f);
+    
+        HighLiteCard(transform.transform, 1f);
     }
 
 
@@ -68,6 +83,7 @@ public class DargeAndDrop : MonoBehaviour
     {
         if (IsRaning && !IsCollide)
         {
+
             IsCollide = true;
             CollidGameObject = collision.gameObject;
             CollidGameObjectPostion = collision.transform.position;
@@ -78,9 +94,10 @@ public class DargeAndDrop : MonoBehaviour
 
     public void OnTriggerExit2D(Collider2D collision)
     {
-        if (IsRaning)
+        if (IsRaning || IsCollide)
         {
             IsCollide = false;
+            CollidGameObject = null;
             HighLiteCard(collision.gameObject.transform, 1f);
         }
       
@@ -114,7 +131,8 @@ public class DargeAndDrop : MonoBehaviour
     public void SwapCard_GameObject(GameObject gameObject1, GameObject gameObject2, Vector3 gameObject1_Postion, Vector3 gameObject2_Postion)
     {
 
-        Transform parent = gameObject1.transform.parent;
+        Transform parent1 = gameObject1.transform.parent;
+        Transform parent2 = gameObject2.transform.parent;
         int siblingIndex1 = gameObject1.transform.GetSiblingIndex();
         int siblingIndex2 = gameObject2.transform.GetSiblingIndex();
 
@@ -123,11 +141,20 @@ public class DargeAndDrop : MonoBehaviour
         //  gameObject2.transform.SetSiblingIndex(-1);
 
 
+       
+
+        gameObject1.transform.localPosition = gameObject2_Postion;
+        gameObject2.transform.localPosition = gameObject1_Postion;
+
+        gameObject1.transform.SetParent(parent2);
+        gameObject2.transform.SetParent(parent1);
         gameObject1.transform.SetSiblingIndex(siblingIndex2);
         gameObject2.transform.SetSiblingIndex(siblingIndex1);
 
+        HighLiteCard(gameObject1.transform, 1f);
+        HighLiteCard(gameObject2.transform, 1f);
 
-        LayoutRebuilder.ForceRebuildLayoutImmediate(parent.GetComponent<RectTransform>());
+        //   LayoutRebuilder.ForceRebuildLayoutImmediate(parent.GetComponent<RectTransform>());
 
     }
 
