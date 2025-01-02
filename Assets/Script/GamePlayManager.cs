@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
-
+using System;
 
 public enum Result 
 {
@@ -258,28 +259,46 @@ public class GamePlayManager : MonoBehaviour
         return pairCount == 2;
     }
 
-    public bool Pair(List<Card> cards)
+    public (bool,List<Card>) Pair(List<Card> cards)
     {
-
-
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        var groupedCards = cards.GroupBy(c => c.Name);
+        var jokerCards = cards.Where(c => c.name == "Joker").ToList();
+        
+        var nonJokerCards = cards.Where(c => c.name != "Joker").ToList();
        
+        var cardGroups = nonJokerCards.GroupBy(c => c.name)
+                                      .Where(g => g.Count() == 2)
+                                      .Select(g => g.ToList())
+                                      .ToList();
 
-        foreach (var group in groupedCards)
+        
+        if (cardGroups.Count > 0)
         {
-            if (group.Count() == 2)
-            {
-                return true;
-            }
+            return (true, cardGroups.First());
         }
-        return false;
+
+       
+        if (jokerCards.Count > 0 && nonJokerCards.Count > 0)
+        {
+            
+            var pairWithJoker = new List<Card> { nonJokerCards.First(), jokerCards.First() };
+            return (true, pairWithJoker);
+        }
+
+       
+        return (false, new List<Card>());
     }
+
+
 
 
 
     public Result TestResult(List<Card> cards)
     {
+        bool IsRoyalFlush;
+        List<Card> ListRoyalFlush = new List<Card>();
+        (IsRoyalFlush, ListRoyalFlush) = Pair(cards);
+
         if (RoyalFlush(cards))
         {
             return Result.RoyalFlush;
@@ -312,10 +331,10 @@ public class GamePlayManager : MonoBehaviour
         {
             return Result.TwoPairs;
         }
-        else if (Pair(cards))
-        { 
-            return Result.Pair;   
-        }
+        //else if (var (foundPair, pair) = Pair(cards))
+        //{
+        //    return Result.Pair;
+        //}
         else
             return Result.HighCard; 
 
