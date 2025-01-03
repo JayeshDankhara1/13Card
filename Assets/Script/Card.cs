@@ -10,7 +10,8 @@ public enum Color
     Diamonds,
     Clubs,
     Hearts,
-    Spades
+    Spades,
+    Null
 }
 [Serializable]
 public enum Name
@@ -27,7 +28,8 @@ public enum Name
     Ten,
     Jack,
     Queen,
-    King
+    King,
+    Joker
 }
 [Serializable]
 public class Card : MonoBehaviour

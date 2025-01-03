@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
-
+using System;
 
 public enum Result 
 {
@@ -33,6 +34,8 @@ public class GamePlayManager : MonoBehaviour
     public GameObject Collide_GameObject1;
     public Vector3 Collide_GameObject_Postion1;
 
+
+    public List<Card> ResultCardList = new List<Card>();    
 
     // Start is called before the first frame update
 
@@ -260,26 +263,38 @@ public class GamePlayManager : MonoBehaviour
 
     public bool Pair(List<Card> cards)
     {
-
-
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        var groupedCards = cards.GroupBy(c => c.Name);
-       
+        ResultCardList.Clear();
+        for (int i = 1; i < cards.Count-1; i++) {
 
-        foreach (var group in groupedCards)
-        {
-            if (group.Count() == 2)
-            {
-                return true;
-            }
+                if (cards[i-1].Name == cards[i].Name)
+                {
+                    ResultCardList.Add(cards[i]);
+                    return true;
+                }
+                else if(cards[i].Name == Name.Joker)
+                {
+                    ResultCardList.Add(cards.First());
+                    ResultCardList.Add(cards[i]);
+                    return false;
+                }
+            
+            
         }
-        return false;
+        return false ;
+
     }
+
+
 
 
 
     public Result TestResult(List<Card> cards)
     {
+       // bool IsRoyalFlush;
+       // List<Card> ListRoyalFlush = new List<Card>();
+       // (IsRoyalFlush, ListRoyalFlush) = Pair(cards);
+
         if (RoyalFlush(cards))
         {
             return Result.RoyalFlush;
@@ -313,8 +328,8 @@ public class GamePlayManager : MonoBehaviour
             return Result.TwoPairs;
         }
         else if (Pair(cards))
-        { 
-            return Result.Pair;   
+        {
+            return Result.Pair;
         }
         else
             return Result.HighCard; 
@@ -325,7 +340,9 @@ public class GamePlayManager : MonoBehaviour
     public void ShowResult()
     {
         Ref_GamePlayUiManager.SetResult1_Text(TestResult(Ref_GamePlayUiManager.List1Call()).ToString());
+
         Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
+
         Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());
     }
   

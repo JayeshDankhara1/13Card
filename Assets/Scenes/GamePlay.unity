@@ -540,8 +540,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1397265477}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &631196743
@@ -884,7 +883,7 @@ RectTransform:
   - {fileID: 2117656716}
   - {fileID: 87380058}
   - {fileID: 1458960172}
-  m_Father: {fileID: 399483762}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1255,6 +1254,7 @@ MonoBehaviour:
   Collide_GameObject_Postion: {x: 0, y: 0, z: 0}
   Collide_GameObject1: {fileID: 0}
   Collide_GameObject_Postion1: {x: 0, y: 0, z: 0}
+  ResultCardList: []
 --- !u!4 &1844214379
 Transform:
   m_ObjectHideFlags: 0
@@ -1546,6 +1546,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 399483762}
+  - {fileID: 1397265477}
   - {fileID: 167453158}
   - {fileID: 722016175}
   - {fileID: 1985512718}
