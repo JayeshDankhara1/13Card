@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6124002704331879217}
   - component: {fileID: 7735746011760267813}
   - component: {fileID: 8850901516053206474}
+  - component: {fileID: 5345504416341118352}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -163,6 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87197808839a76d45882a149bd3bdfe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Canvas: {fileID: 5345504416341118352}
   Ref_GamePlayManager: {fileID: 0}
   ThisGameObject: {fileID: 0}
   CollidGameObject: {fileID: 0}
@@ -182,3 +184,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Color: 0
   Name: 0
+--- !u!223 &5345504416341118352
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6166957593997828101}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0

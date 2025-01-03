@@ -35,6 +35,8 @@ public class GamePlayManager : MonoBehaviour
     public Vector3 Collide_GameObject_Postion1;
 
 
+    public List<Card> ResultCardList = new List<Card>();    
+
     // Start is called before the first frame update
 
     public void Awake()
@@ -259,34 +261,28 @@ public class GamePlayManager : MonoBehaviour
         return pairCount == 2;
     }
 
-    public (bool,List<Card>) Pair(List<Card> cards)
+    public bool Pair(List<Card> cards)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        var jokerCards = cards.Where(c => c.name == "Joker").ToList();
-        
-        var nonJokerCards = cards.Where(c => c.name != "Joker").ToList();
-       
-        var cardGroups = nonJokerCards.GroupBy(c => c.name)
-                                      .Where(g => g.Count() == 2)
-                                      .Select(g => g.ToList())
-                                      .ToList();
+        ResultCardList.Clear();
+        for (int i = 1; i < cards.Count-1; i++) {
 
-        
-        if (cardGroups.Count > 0)
-        {
-            return (true, cardGroups.First());
-        }
-
-       
-        if (jokerCards.Count > 0 && nonJokerCards.Count > 0)
-        {
+                if (cards[i-1].Name == cards[i].Name)
+                {
+                    ResultCardList.Add(cards[i]);
+                    return true;
+                }
+                else if(cards[i].Name == Name.Joker)
+                {
+                    ResultCardList.Add(cards.First());
+                    ResultCardList.Add(cards[i]);
+                    return false;
+                }
             
-            var pairWithJoker = new List<Card> { nonJokerCards.First(), jokerCards.First() };
-            return (true, pairWithJoker);
+            
         }
+        return false ;
 
-       
-        return (false, new List<Card>());
     }
 
 
@@ -295,9 +291,9 @@ public class GamePlayManager : MonoBehaviour
 
     public Result TestResult(List<Card> cards)
     {
-        bool IsRoyalFlush;
-        List<Card> ListRoyalFlush = new List<Card>();
-        (IsRoyalFlush, ListRoyalFlush) = Pair(cards);
+       // bool IsRoyalFlush;
+       // List<Card> ListRoyalFlush = new List<Card>();
+       // (IsRoyalFlush, ListRoyalFlush) = Pair(cards);
 
         if (RoyalFlush(cards))
         {
@@ -331,10 +327,10 @@ public class GamePlayManager : MonoBehaviour
         {
             return Result.TwoPairs;
         }
-        //else if (var (foundPair, pair) = Pair(cards))
-        //{
-        //    return Result.Pair;
-        //}
+        else if (Pair(cards))
+        {
+            return Result.Pair;
+        }
         else
             return Result.HighCard; 
 
@@ -344,7 +340,9 @@ public class GamePlayManager : MonoBehaviour
     public void ShowResult()
     {
         Ref_GamePlayUiManager.SetResult1_Text(TestResult(Ref_GamePlayUiManager.List1Call()).ToString());
+
         Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
+
         Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());
     }
   

@@ -13,6 +13,8 @@ public class DargeAndDrop : MonoBehaviour
     Vector3 TransformPostion;
     Vector3 CollidGameObjectPostion;
 
+    public Canvas Canvas;
+    
     public GamePlayManager Ref_GamePlayManager;
 
 
@@ -39,6 +41,7 @@ public class DargeAndDrop : MonoBehaviour
         TransformPostion = transform.position;
         HighLiteCard(ThisGameObject.transform, 1.2f);
         MousePostionOffset = gameObject.transform.position - GetMousePostion();
+        Canvas.sortingOrder = 10;
     }
 
     public void OnMouseDrag()
@@ -69,7 +72,7 @@ public class DargeAndDrop : MonoBehaviour
             CollidGameObject = null;
         }
         IsRaning = false;
-    
+        Canvas.sortingOrder = 0;
         HighLiteCard(transform.transform, 1f);
     }
 
