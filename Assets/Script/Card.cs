@@ -16,7 +16,7 @@ public enum Color
 [Serializable]
 public enum Name
 {
-    Ace,
+    
     Two,
     Three,
     Four,
@@ -29,6 +29,7 @@ public enum Name
     Jack,
     Queen,
     King,
+    Ace,
     Joker
 }
 [Serializable]

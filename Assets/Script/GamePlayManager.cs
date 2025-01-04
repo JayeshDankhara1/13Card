@@ -5,6 +5,8 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using System;
+using Unity.Collections.LowLevel.Unsafe;
+using System.Diagnostics.Contracts;
 
 public enum Result 
 {
@@ -248,33 +250,41 @@ public class GamePlayManager : MonoBehaviour
     public bool TwoPairs(List<Card> cards)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        var groupedCards = cards.GroupBy(c => c.Name);      
-        int pairCount = 0;
-
-        foreach (var group in groupedCards)
+        ResultCardList.Clear();
+        int pair = 0;
+        for (int i = 1; i < cards.Count; i++) 
         {
-            if (group.Count() == 2)
+            if (cards[i - 1].Name == cards[i].Name)
             {
-                pairCount++;
+                ResultCardList.Add(cards[i]);
+                ResultCardList.Add(cards[i - 1]);
+                return true;
+            }
+            else if (cards[i].Name == Name.Joker && pair==1)
+            {
+                ResultCardList.Add(cards[i - 1]);
+                ResultCardList.Add(cards[i]);
+                return false;
             }
         }
-        return pairCount == 2;
+        return false;
     }
 
     public bool Pair(List<Card> cards)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         ResultCardList.Clear();
-        for (int i = 1; i < cards.Count-1; i++) {
+        for (int i = 1; i < cards.Count; i++) {
 
                 if (cards[i-1].Name == cards[i].Name)
                 {
                     ResultCardList.Add(cards[i]);
-                    return true;
+                    ResultCardList.Add(cards[i-1]);
+                return true;
                 }
                 else if(cards[i].Name == Name.Joker)
                 {
-                    ResultCardList.Add(cards.First());
+                    ResultCardList.Add(cards[i-1]);
                     ResultCardList.Add(cards[i]);
                     return false;
                 }
@@ -285,15 +295,31 @@ public class GamePlayManager : MonoBehaviour
 
     }
 
+    public bool FindJoker(List<Card> cards)
+    {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        
+              return false;
+    }
+
+    public bool HighCard(List<Card> cards)
+    {
+        ResultCardList.Clear();
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+
+        ResultCardList.Add(cards.Last());
+        Debug.Log("HighCard Update");
+        return true;
+    }
 
 
 
 
     public Result TestResult(List<Card> cards)
     {
-       // bool IsRoyalFlush;
-       // List<Card> ListRoyalFlush = new List<Card>();
-       // (IsRoyalFlush, ListRoyalFlush) = Pair(cards);
+        // bool IsRoyalFlush;
+        // List<Card> ListRoyalFlush = new List<Card>();
+        // (IsRoyalFlush, ListRoyalFlush) = Pair(cards);
 
         if (RoyalFlush(cards))
         {
@@ -331,19 +357,37 @@ public class GamePlayManager : MonoBehaviour
         {
             return Result.Pair;
         }
-        else
-            return Result.HighCard; 
-
+        else 
+        {
+            HighCard(cards);
+            return Result.HighCard;
+        }
     }
 
+
+    public void HighLiteCard(List<Card> cards)
+    {
+        for (int j = 0; j < ResultCardList.Count; j++)
+        {
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (ResultCardList[j].Name == cards[i].Name && ResultCardList[j].Color == cards[i].Color)
+                {
+                    cards[i].gameObject.transform.localScale = Vector3.one *1.2f;
+                }
+            }
+        }
+    }
+    
 
     public void ShowResult()
     {
         Ref_GamePlayUiManager.SetResult1_Text(TestResult(Ref_GamePlayUiManager.List1Call()).ToString());
-
+        HighLiteCard(Ref_GamePlayUiManager.List1Call());
         Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
-
+        HighLiteCard(Ref_GamePlayUiManager.List2Call());
         Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());
+        HighLiteCard(Ref_GamePlayUiManager.List3Call());
     }
   
 }
