@@ -217,14 +217,63 @@ public class GamePlayManager : MonoBehaviour
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         ResultCardList.Clear();
         if (FindJoker(cards) && FindAce(cards))
-        { 
+        {
+            
+            bool IsSkip = true;
+            if (FindTwo(cards))
+            { 
+                for(int i = 0; i < cards.Count-1;i++)
+                {
+                    if (cards[i - 1].Name == cards[i].Name - 1)
+                    {
+                        continue;
+                    }
+                    else if (cards[i - 1].Name + 1 == cards[i].Name - 1 && IsSkip)
+                    {
+                        IsSkip = false;
+                        continue;
+                    }
+                    else if (cards[i].Name == Name.Ace && i==3)
+                    {
+                        ResultCardList = cards;
+                       return true;
+                    }
+                    else 
+                    {
+                        return false;
+                    }
+                }
+                ResultCardList = cards;
+                return true ;
+            }
 
+            IsSkip = true;
+            for (int i = 1;i < cards.Count-1;i++)
+            {
+                if (cards[i - 1].Name == cards[i].Name - 1)
+                {
+                    continue;
+                }
+                else if (cards[i - 1].Name + 1 == cards[i].Name - 1 && IsSkip)
+                {
+                    IsSkip = false;
+                    continue;
+                }
+                else
+                { 
+                    return false ;
+                }
+            }
+            ResultCardList = cards;
+            return true;
 
         }
         else if (FindAce(cards))
         {
+            Debug.Log("Fast Condtion Active");
             if (FindTwo(cards))
             {
+                Debug.Log("Secound Condtion Active");
                 for (int i = 0; i < cards.Count - 2; i++)
                 {
                     if (cards[i].Name + 1 == cards[i + 1].Name)
@@ -299,8 +348,6 @@ public class GamePlayManager : MonoBehaviour
             ResultCardList = cards;
             return true;
         }
-
-        return false;
     }
 
 
@@ -411,10 +458,12 @@ public class GamePlayManager : MonoBehaviour
     }
     public bool FindKing(List<Card> cards)
     {
-        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        if (cards.Last().Name == Name.King)
+        for (int i = 0; i < cards.Count; i++)
         {
-            return true;
+            if (cards[i].Name == Name.King)
+            {
+                return true;
+            }
         }
         return false;
 
@@ -422,20 +471,24 @@ public class GamePlayManager : MonoBehaviour
 
     public bool FindTwo(List<Card> cards)
     {
-        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        if (cards.Last().Name == Name.Two)
+        for (int i = 0; i < cards.Count; i++)
         {
-            return true;
+            if (cards[i].Name == Name.Two)
+            {
+                return true;
+            }
         }
         return false;
 
     }
     public bool FindAce(List<Card> cards)
     {
-        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        if (cards.Last().Name == Name.Ace)
+        for (int i = 0; i < cards.Count; i++)
         {
-            return true;
+            if (cards[i].Name == Name.Ace)
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -504,16 +557,16 @@ public class GamePlayManager : MonoBehaviour
 
     public void HighLiteCard(List<Card> cards)
     {
-        for (int j = 0; j < ResultCardList.Count; j++)
-        {
-            for (int i = 0; i < cards.Count; i++)
-            {
-                if (ResultCardList[j].Name == cards[i].Name && ResultCardList[j].Color == cards[i].Color)
-                {
-                    cards[i].gameObject.transform.localScale = Vector3.one *1.2f;
-                }
-            }
-        }
+        //for (int j = 0; j < ResultCardList.Count; j++)
+        //{
+        //    for (int i = 0; i < cards.Count; i++)
+        //    {
+        //        if (ResultCardList[j].Name == cards[i].Name && ResultCardList[j].Color == cards[i].Color)
+        //        {
+        //            cards[i].gameObject.transform.localScale = Vector3.one *1.2f;
+        //        }
+        //    }
+        //}
     }
     
 
