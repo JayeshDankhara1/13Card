@@ -7,6 +7,8 @@ using UnityEngine;
 using System;
 using Unity.Collections.LowLevel.Unsafe;
 using System.Diagnostics.Contracts;
+using System.Collections.ObjectModel;
+using UnityEngine.UIElements;
 
 public enum Result 
 {
@@ -211,69 +213,180 @@ public class GamePlayManager : MonoBehaviour
     }
     public bool Straight(List<Card> cards)
     {
-        if (cards.Count < 5)
-            return false;
-        Jump:
+        if(cards.Count < 5) return false;
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        for (int i = 1; i < cards.Count ; i++)
-        {
-            if (cards[i].Name != cards[i - 1].Name + 1)
-            {
-                if (cards[0].Name == Name.Ace && cards[cards.Count - 1].Name == Name.King)
-                {
-                    cards.RemoveAt(0);
-                    goto Jump;
-                }
-                return false;
-            }
+        ResultCardList.Clear();
+        if (FindJoker(cards) && FindAce(cards))
+        { 
+
+
         }
-        return true;
+        else if (FindAce(cards))
+        {
+            if (FindTwo(cards))
+            {
+                for (int i = 0; i < cards.Count - 2; i++)
+                {
+                    if (cards[i].Name + 1 == cards[i + 1].Name)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                ResultCardList = cards;
+                return true;
+            }
+            else 
+            {
+                for (int i = 0; i < cards.Count - 1; i++)
+                {
+                    if (cards[i].Name + 1 == cards[i + 1].Name)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                ResultCardList = cards;
+                return true;
+            }
+            
+        }
+        else if (FindJoker(cards))
+        {
+            bool IsSkip = true;
+            for (int i = 1; i < cards.Count-1; i++)
+            {
+
+                if (cards[i - 1].Name == cards[i].Name - 1)
+                {
+                    continue;
+                }
+                else if (cards[i - 1].Name + 1 == cards[i].Name - 1 && IsSkip)
+                {
+                    IsSkip = false;
+                    continue;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            ResultCardList = cards;
+            return true;
+        }
+        else
+        {
+            for (int i = 1; i < cards.Count; i++)
+            {
+
+                if (cards[i - 1].Name == cards[i].Name - 1)
+                {
+                    continue;
+                }
+                else
+                {
+                    return false;
+                }
+                
+            }
+            ResultCardList = cards;
+            return true;
+        }
+
+        return false;
     }
 
-  
+
 
     public bool ThreeOfaKind(List<Card> cards)
     {
-        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        var groupedCards = cards.GroupBy(c => c.Name);
-
-        foreach (var group in groupedCards)
+          cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+          ResultCardList.Clear();
+        if (FindJoker(cards))
         {
-            if (group.Count() == 3)
+            if (Pair(cards, false))
             {
+                ResultCardList.Add(cards[cards.Count - 1]);
                 return true;
             }
         }
-        return false;
        
+            var rankGroups = cards
+            .GroupBy(card => card.Name)  
+            .Where(group => group.Count() == 3) 
+            .ToList();
+
+        if (rankGroups.Any())
+        {
+            ResultCardList=rankGroups.First().ToList();
+            return true;
+        }
+
+
+        return false;
+
+
     }
     public bool TwoPairs(List<Card> cards)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         ResultCardList.Clear();
-        int pair = 0;
-        for (int i = 1; i < cards.Count; i++) 
+        int Count = 0;
+        if (FindJoker(cards))
         {
-            if (cards[i - 1].Name == cards[i].Name)
+            if (Pair(cards, false))
             {
-                ResultCardList.Add(cards[i]);
-                ResultCardList.Add(cards[i - 1]);
-                return true;
+                ResultCardList.Add(cards[cards.Count - 1]);
+                for (int i = 0; i < ResultCardList.Count; i++)
+                {
+                    for (int j = cards.Count - 1; j >= 0; j--)
+                    {
+                        if (ResultCardList[i].Name != cards[i].Name)
+                        {
+                            ResultCardList.Add(cards[i]);
+                            return true;
+                        }
+                    }
+                }
             }
-            else if (cards[i].Name == Name.Joker && pair==1)
+        }
+        else
+        {
+            for (int i = 1; i < cards.Count; i++)
             {
-                ResultCardList.Add(cards[i - 1]);
-                ResultCardList.Add(cards[i]);
-                return false;
+                if (cards[i-1].Name == cards[i].Name)
+                {
+                    ResultCardList.Add(cards[i]);
+                    ResultCardList.Add(cards[i-1]);
+                    Count++;
+                    i++;
+                    if (Count == 2)
+                    {
+                        return true;
+                    }
+                }
             }
         }
         return false;
     }
 
-    public bool Pair(List<Card> cards)
+    public bool Pair(List<Card> cards,bool IsJock =true)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         ResultCardList.Clear();
+        if (FindJoker(cards) && IsJock) {
+            ResultCardList.Add(cards[cards.Count-1]);
+            ResultCardList.Add(cards[cards.Count-2]);
+            return true;
+        }
+
         for (int i = 1; i < cards.Count; i++) {
 
                 if (cards[i-1].Name == cards[i].Name)
@@ -282,14 +395,6 @@ public class GamePlayManager : MonoBehaviour
                     ResultCardList.Add(cards[i-1]);
                 return true;
                 }
-                else if(cards[i].Name == Name.Joker)
-                {
-                    ResultCardList.Add(cards[i-1]);
-                    ResultCardList.Add(cards[i]);
-                    return false;
-                }
-            
-            
         }
         return false ;
 
@@ -298,22 +403,54 @@ public class GamePlayManager : MonoBehaviour
     public bool FindJoker(List<Card> cards)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        
-              return false;
+        if (cards.Last().Name == Name.Joker)
+        { 
+        return true; 
+        }
+      return false;
+    }
+    public bool FindKing(List<Card> cards)
+    {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        if (cards.Last().Name == Name.King)
+        {
+            return true;
+        }
+        return false;
+
     }
 
+    public bool FindTwo(List<Card> cards)
+    {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        if (cards.Last().Name == Name.Two)
+        {
+            return true;
+        }
+        return false;
+
+    }
+    public bool FindAce(List<Card> cards)
+    {
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        if (cards.Last().Name == Name.Ace)
+        {
+            return true;
+        }
+        return false;
+    }
     public bool HighCard(List<Card> cards)
     {
         ResultCardList.Clear();
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
 
-        ResultCardList.Add(cards.Last());
-        Debug.Log("HighCard Update");
+       ResultCardList.Add(cards.Last());
+        
         return true;
     }
 
 
-
+  
 
     public Result TestResult(List<Card> cards)
     {

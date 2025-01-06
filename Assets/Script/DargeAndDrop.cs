@@ -62,6 +62,7 @@ public class DargeAndDrop : MonoBehaviour
             IsCollide = false;
             ThisGameObject = null;
             CollidGameObject = null;
+            Ref_GamePlayManager.Ref_GamePlayUiManager.AllCardListUpdate();
 
         }
         else { 
