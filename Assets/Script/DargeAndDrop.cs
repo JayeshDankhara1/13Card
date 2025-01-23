@@ -38,7 +38,7 @@ public class DargeAndDrop : MonoBehaviour
     {
         IsRaning = true;
         ThisGameObject = transform.gameObject;
-        TransformPostion = transform.position;
+        TransformPostion = transform.localPosition;
         HighLiteCard(ThisGameObject.transform, 1.2f);
         MousePostionOffset = gameObject.transform.position - GetMousePostion();
         Canvas.sortingOrder = 10;
@@ -58,22 +58,25 @@ public class DargeAndDrop : MonoBehaviour
     {
         if (ThisGameObject != null && CollidGameObject != null)
         {
-            SwapCard_GameObject(ThisGameObject, CollidGameObject, TransformPostion, CollidGameObjectPostion);
+            SwapCard_GameObject(ThisGameObject, CollidGameObject);
+            Ref_GamePlayManager.Ref_GamePlayUiManager.DeHighliteAllCard();
+
             IsCollide = false;
             ThisGameObject = null;
             CollidGameObject = null;
             Ref_GamePlayManager.Ref_GamePlayUiManager.AllCardListUpdate();
 
+
         }
-        else { 
-        
-            transform.position = TransformPostion;
+       
+
+            transform.localPosition = TransformPostion;
             IsCollide = false;
             ThisGameObject = null;
             CollidGameObject = null;
-        }
+        
         IsRaning = false;
-        Canvas.sortingOrder = 0;
+        Canvas.sortingOrder = 1;
         HighLiteCard(transform.transform, 1f);
     }
 
@@ -90,7 +93,7 @@ public class DargeAndDrop : MonoBehaviour
 
             IsCollide = true;
             CollidGameObject = collision.gameObject;
-            CollidGameObjectPostion = collision.transform.position;
+            CollidGameObjectPostion = collision.transform.localPosition;
             HighLiteCard(collision.gameObject.transform, 1.2f);
         }
        
@@ -132,28 +135,31 @@ public class DargeAndDrop : MonoBehaviour
         transform.localScale = Vector3.one * Scale;
     }
 
-    public void SwapCard_GameObject(GameObject gameObject1, GameObject gameObject2, Vector3 gameObject1_Postion, Vector3 gameObject2_Postion)
+    public void SwapCard_GameObject(GameObject gameObject1, GameObject gameObject2)
     {
+        SwapCard(gameObject1.GetComponent<Card>(), gameObject2.GetComponent<Card>());
+        LoadSprit(gameObject1);
+        LoadSprit(gameObject2);
+        //  Ref_GamePlayManager.Ref_GamePlayUiManager.AllCardListUpdate();
+        //   Transform parent1 = gameObject1.transform.parent;
+        //   Transform parent2 = gameObject2.transform.parent;
+        //   int siblingIndex1 = gameObject1.transform.GetSiblingIndex();
+        //   int siblingIndex2 = gameObject2.transform.GetSiblingIndex();
 
-        Transform parent1 = gameObject1.transform.parent;
-        Transform parent2 = gameObject2.transform.parent;
-        int siblingIndex1 = gameObject1.transform.GetSiblingIndex();
-        int siblingIndex2 = gameObject2.transform.GetSiblingIndex();
+
+        //   //   gameObject1.transform.SetSiblingIndex(-1);
+        //   //  gameObject2.transform.SetSiblingIndex(-1);
 
 
-        //   gameObject1.transform.SetSiblingIndex(-1);
-        //  gameObject2.transform.SetSiblingIndex(-1);
 
 
-       
+        ////   gameObject1.transform.localPosition = gameObject1_Postion;
+        //  // gameObject2.transform.localPosition = gameObject2_Postion;
 
-        gameObject1.transform.localPosition = gameObject2_Postion;
-        gameObject2.transform.localPosition = gameObject1_Postion;
-
-        gameObject1.transform.SetParent(parent2);
-        gameObject2.transform.SetParent(parent1);
-        gameObject1.transform.SetSiblingIndex(siblingIndex2);
-        gameObject2.transform.SetSiblingIndex(siblingIndex1);
+        //   gameObject1.transform.SetParent(parent2);
+        //   gameObject2.transform.SetParent(parent1);
+        //   gameObject1.transform.SetSiblingIndex(siblingIndex2);
+        //   gameObject2.transform.SetSiblingIndex(siblingIndex1);
 
         HighLiteCard(gameObject1.transform, 1f);
         HighLiteCard(gameObject2.transform, 1f);

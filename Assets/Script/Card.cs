@@ -34,8 +34,10 @@ public enum Name
 }
 [Serializable]
 public class Card : MonoBehaviour
-{ 
+{
+    [SerializeField] 
     public Color Color;
+    [SerializeField]
     public Name Name;
 
    public Card(Color color, Name name)

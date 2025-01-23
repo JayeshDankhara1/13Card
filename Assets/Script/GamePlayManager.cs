@@ -2,13 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using System;
-using Unity.Collections.LowLevel.Unsafe;
-using System.Diagnostics.Contracts;
-using System.Collections.ObjectModel;
-using UnityEngine.UIElements;
+
 
 public enum Result 
 {
@@ -49,7 +47,7 @@ public class GamePlayManager : MonoBehaviour
     }
     public void Start()
     {
-        StartCoroutine(GameStart());
+       // StartCoroutine(GameStart());
     
     }
 
@@ -61,6 +59,8 @@ public class GamePlayManager : MonoBehaviour
 
     public IEnumerator GameStart()
     {
+        Ref_GamePlayUiManager.TabelSetActive(false);
+        Ref_GamePlayUiManager.HedarParentSetActive(false);
         Ref_GamePlayUiManager.CounDowan(true);
         for (int i = 3; i >= 0; i--)
         {
@@ -75,9 +75,12 @@ public class GamePlayManager : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         Ref_GamePlayUiManager.CounDowan(false);
+        StartCoroutine(Coundown(180));
+        Ref_GamePlayUiManager.HedarParentSetActive(true);
+        Ref_GamePlayUiManager.TabelSetActive(true);
         Ref_GamePlayUiManager.LoadCard();
         Ref_GamePlayUiManager.AllCardListUpdate();
-
+        
         
       //  Ref_GamePlayUiManager.LoadCard();
 
@@ -120,7 +123,6 @@ public class GamePlayManager : MonoBehaviour
 
     public int GetColor(Color color)
     {
-       // Debug.Log("Color" + color);
         switch (color)
         {
             case Color.Clubs:
@@ -136,14 +138,14 @@ public class GamePlayManager : MonoBehaviour
         return 0;
     }
 
-
-
-
     public bool RoyalFlush(List<Card> cards)
     {
+        ResultCardList.Clear();
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        if (StraightFlush(cards) && cards[0].Name == Name.Ace && cards[cards.Count - 1].Name == Name.King)
+
+        if (cards[0].Color == Color.Spades && cards.Find(c=> c.Name==Name.King) && !cards.Find(c => c.Name == Name.Ace) && StraightFlush(cards))
         {
+            ResultCardList.AddRange(cards);
             return true;
         }
         return false;
@@ -151,274 +153,228 @@ public class GamePlayManager : MonoBehaviour
     }
     public bool StraightFlush(List<Card> cards)
     {
+        ResultCardList.Clear();
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         if (Flush(cards) && Straight(cards))
         {
+            ResultCardList.AddRange(cards);
             return true;
         }
         return false;
     }
     public bool FourOfaKind(List<Card> cards)
     {
-       
         if (cards.Count < 5)
-            return false;
-        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+            return false;  
 
-        var groupedCards = cards.GroupBy(c => c.Name);
+        ResultCardList.Clear(); 
 
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name)); 
+
+        int jokerCount = cards.Count(card => card.Name == Name.Joker); 
+
+        var groupedCards = cards.GroupBy(c => c.Name);  
+     
         foreach (var group in groupedCards)
         {
             if (group.Count() == 4)
             {
-                    return true;
+           
+                ResultCardList.AddRange(group);
+                return true;  
+            }
+            else if (group.Count() == 3 && jokerCount > 0)
+            {
+            
+                ResultCardList.AddRange(group); 
+                ResultCardList.Add(new Card(Color.Null,Name.Joker));  
+                return true; 
             }
         }
-      return false;
-   
+        return false;
+
     }
 
    
     public bool FullHouse(List<Card> cards)
     {
-        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        var groupedCards = cards.GroupBy(c => c.Name);
+        if (cards.Count < 5)
+            return false;  
 
-        bool hasThree = ThreeOfaKind(cards);
+        ResultCardList.Clear();  
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));  
+
+        int jokerCount = cards.Count(card => card.Name == Name.Joker);  
+
+        var groupedCards = cards.GroupBy(c => c.Name);  
+
+        bool hasThree = false;
         bool hasTwo = false;
+
+      
+        List<Card> threeOfAKindCards = new List<Card>();
+        List<Card> pairCards = new List<Card>();
 
         foreach (var group in groupedCards)
         {
-            if (group.Count() == 2)
+            if (group.Count() == 3)
+            {
+                hasThree = true;
+                threeOfAKindCards.AddRange(group);  
+            }
+            else if (group.Count() == 2)
             {
                 hasTwo = true;
+                pairCards.AddRange(group); 
             }
         }
-        return hasThree && hasTwo;
 
+        
+        if(FindJoker(cards))
+        {
+            int pairCount = 0;
+            foreach (var group in groupedCards)
+            {
+                if (group.Count() == 2)
+                {
+                    pairCount++;
+
+                }
+                else if (pairCount >= 2)
+                {
+                    hasThree = true;
+                    hasTwo = true;
+                }
+
+
+            }
+        }
+
+        if (hasThree && hasTwo)
+        {
+            
+            ResultCardList.AddRange(cards);
+            return true;
+        }
+
+        return false;  
     }
     public bool Flush(List<Card> cards)
     {
         if (cards.Count < 5)
             return false;
+        ResultCardList.Clear();
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+
         for (int i = 0; i < cards.Count-1; i++)
         {
-            if (cards[i].Color != cards[i+1].Color)
+            if (cards[i].Color != cards[i + 1].Color)
             {
-                return false;
+                if (cards[i + 1].Name == Name.Joker)
+                {
+                    continue;
+                }
+                 return false;
             }
+           
         }
+        ResultCardList.AddRange(cards);
         return true;
     }
     public bool Straight(List<Card> cards)
     {
-        if(cards.Count < 5) return false;
+        if (cards.Count < 5) return false;
+
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
         ResultCardList.Clear();
-        if (FindJoker(cards) && FindAce(cards))
-        {
-            
-            bool IsSkip = true;
-            if (FindTwo(cards))
-            { 
-                for(int i = 0; i < cards.Count-1;i++)
-                {
-                    if (cards[i - 1].Name == cards[i].Name - 1)
-                    {
-                        continue;
-                    }
-                    else if (cards[i - 1].Name + 1 == cards[i].Name - 1 && IsSkip)
-                    {
-                        IsSkip = false;
-                        continue;
-                    }
-                    else if (cards[i].Name == Name.Ace && i==3)
-                    {
-                        ResultCardList = cards;
-                       return true;
-                    }
-                    else 
-                    {
-                        return false;
-                    }
-                }
-                ResultCardList = cards;
-                return true ;
-            }
 
-            IsSkip = true;
-            for (int i = 1;i < cards.Count-1;i++)
-            {
-                if (cards[i - 1].Name == cards[i].Name - 1)
-                {
-                    continue;
-                }
-                else if (cards[i - 1].Name + 1 == cards[i].Name - 1 && IsSkip)
-                {
-                    IsSkip = false;
-                    continue;
-                }
-                else
-                { 
-                    return false ;
-                }
-            }
-            ResultCardList = cards;
-            return true;
+        bool isJokerUsed = false;
+        bool isAceLow = false;
 
-        }
-        else if (FindAce(cards))
+       
+        for (int i = 1; i < cards.Count; i++)
         {
-            Debug.Log("Fast Condtion Active");
-            if (FindTwo(cards))
+         
+            if (cards[i].Name == cards[i - 1].Name + 1)
             {
-                Debug.Log("Secound Condtion Active");
-                for (int i = 0; i < cards.Count - 2; i++)
-                {
-                    if (cards[i].Name + 1 == cards[i + 1].Name)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                ResultCardList = cards;
-                return true;
-            }
-            else 
-            {
-                for (int i = 0; i < cards.Count - 1; i++)
-                {
-                    if (cards[i].Name + 1 == cards[i + 1].Name)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                ResultCardList = cards;
-                return true;
+                continue;
             }
             
-        }
-        else if (FindJoker(cards))
-        {
-            bool IsSkip = true;
-            for (int i = 1; i < cards.Count-1; i++)
+            else if (cards[i].Name == Name.Joker || (FindJoker(cards) &&!isJokerUsed && cards[i].Name == cards[i - 1].Name + 2))
             {
-
-                if (cards[i - 1].Name == cards[i].Name - 1)
-                {
-                    continue;
-                }
-                else if (cards[i - 1].Name + 1 == cards[i].Name - 1 && IsSkip)
-                {
-                    IsSkip = false;
-                    continue;
-                }
-                else
-                {
-                    return false;
-                }
-
+                isJokerUsed = true;
+                continue;
             }
-            ResultCardList = cards;
-            return true;
-        }
-        else
-        {
-            for (int i = 1; i < cards.Count; i++)
+            
+            else if (cards[i].Name == Name.Ace && cards[0].Name == Name.Two && !isAceLow)
             {
-
-                if (cards[i - 1].Name == cards[i].Name - 1)
-                {
-                    continue;
-                }
-                else
-                {
-                    return false;
-                }
-                
+                isAceLow = true;
+                continue;
             }
-            ResultCardList = cards;
-            return true;
+          
+            else
+            {
+                return false;
+            }
         }
+        ResultCardList.AddRange(cards);
+        return true;
     }
 
 
-
-    public bool ThreeOfaKind(List<Card> cards)
+    public bool ThreeOfaKind(List<Card> cards, bool IsJock = true)
     {
-          cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-          ResultCardList.Clear();
-        if (FindJoker(cards))
+    
+        cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        var groupedCards = cards.GroupBy(c => c.Name);
+        ResultCardList.Clear();
+
+        foreach (var group in groupedCards)
         {
-            if (Pair(cards, false))
+        
+            if (group.Count() == 3)
             {
-                ResultCardList.Add(cards[cards.Count - 1]);
-                return true;
+                ResultCardList.AddRange(group);
+                return true; 
+            }
+           
+            else if (group.Count() == 2 && IsJock && FindJoker(cards))
+            {
+                ResultCardList.AddRange(group);
+                ResultCardList.Add(new Card(Color.Null, Name.Joker));
+                return true; 
             }
         }
-       
-            var rankGroups = cards
-            .GroupBy(card => card.Name)  
-            .Where(group => group.Count() == 3) 
-            .ToList();
 
-        if (rankGroups.Any())
-        {
-            ResultCardList=rankGroups.First().ToList();
-            return true;
-        }
-
-
+  
         return false;
-
 
     }
     public bool TwoPairs(List<Card> cards)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+        var groupedCards = cards.GroupBy(c => c.Name);
         ResultCardList.Clear();
-        int Count = 0;
-        if (FindJoker(cards))
+        int pairCount = 0;
+        bool IsJockUse = false;
+        foreach (var group in groupedCards)
         {
-            if (Pair(cards, false))
+         
+            if (group.Count() == 2)
             {
-                ResultCardList.Add(cards[cards.Count - 1]);
-                for (int i = 0; i < ResultCardList.Count; i++)
-                {
-                    for (int j = cards.Count - 1; j >= 0; j--)
-                    {
-                        if (ResultCardList[i].Name != cards[i].Name)
-                        {
-                            ResultCardList.Add(cards[i]);
-                            return true;
-                        }
-                    }
-                }
+                pairCount++;
+                ResultCardList.AddRange(group); 
             }
-        }
-        else
-        {
-            for (int i = 1; i < cards.Count; i++)
+           
+            else if (pairCount == 1  && FindJoker(cards) && !IsJockUse)
             {
-                if (cards[i-1].Name == cards[i].Name)
-                {
-                    ResultCardList.Add(cards[i]);
-                    ResultCardList.Add(cards[i-1]);
-                    Count++;
-                    i++;
-                    if (Count == 2)
-                    {
-                        return true;
-                    }
-                }
+                IsJockUse = true;
+                pairCount++;
+                ResultCardList.Add(group.First());
+            }
+            if (pairCount >= 2)
+            {
+                return true;
             }
         }
         return false;
@@ -427,34 +383,38 @@ public class GamePlayManager : MonoBehaviour
     public bool Pair(List<Card> cards,bool IsJock =true)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
+
+        var groupedCards = cards.GroupBy(c => c.Name);
         ResultCardList.Clear();
-        if (FindJoker(cards) && IsJock) {
-            ResultCardList.Add(cards[cards.Count-1]);
-            ResultCardList.Add(cards[cards.Count-2]);
-            return true;
-        }
 
-        for (int i = 1; i < cards.Count; i++) {
-
-                if (cards[i-1].Name == cards[i].Name)
-                {
-                    ResultCardList.Add(cards[i]);
-                    ResultCardList.Add(cards[i-1]);
+        foreach (var group in groupedCards)
+        {
+            if (group.Count() == 2)
+            {
+                ResultCardList.AddRange(group);
                 return true;
-                }
+            }
+            else if(group.Count() == 1 && FindJoker(cards) && IsJock) 
+            {
+                ResultCardList.Add(cards[cards.Count-2]);
+                ResultCardList.Add(new Card(Color.Null,Name.Joker));
+                return true;
+            }
         }
-        return false ;
-
+        return false;
     }
 
     public bool FindJoker(List<Card> cards)
     {
         cards.Sort((card1, card2) => card1.Name.CompareTo(card2.Name));
-        if (cards.Last().Name == Name.Joker)
-        { 
-        return true; 
+        for (int i = 0; i < cards.Count; i++)
+        {
+            if (cards[i].Name == Name.Joker)
+            {
+                return true;
+            }
         }
-      return false;
+        return false;
     }
     public bool FindKing(List<Card> cards)
     {
@@ -506,13 +466,9 @@ public class GamePlayManager : MonoBehaviour
   
 
     public Result TestResult(List<Card> cards)
-    {
-        // bool IsRoyalFlush;
-        // List<Card> ListRoyalFlush = new List<Card>();
-        // (IsRoyalFlush, ListRoyalFlush) = Pair(cards);
-
+    { 
         if (RoyalFlush(cards))
-        {
+        {   
             return Result.RoyalFlush;
         }
         else if (StraightFlush(cards))
@@ -552,32 +508,47 @@ public class GamePlayManager : MonoBehaviour
             HighCard(cards);
             return Result.HighCard;
         }
+
     }
 
 
     public void HighLiteCard(List<Card> cards)
     {
-        //for (int j = 0; j < ResultCardList.Count; j++)
-        //{
-        //    for (int i = 0; i < cards.Count; i++)
-        //    {
-        //        if (ResultCardList[j].Name == cards[i].Name && ResultCardList[j].Color == cards[i].Color)
-        //        {
-        //            cards[i].gameObject.transform.localScale = Vector3.one *1.2f;
-        //        }
-        //    }
-        //}
+        for (int i = 0; i < cards.Count; i++)
+        {
+            for (int j = 0; j < ResultCardList.Count; j++)
+            {
+                if (cards[i].Name == ResultCardList[j].Name && cards[i].Color == ResultCardList[j].Color)
+                {
+                    Ref_GamePlayUiManager.GetImage_Sorce(cards[i].gameObject).color = Ref_GamePlayUiManager.Y_Color;
+                }
+            }
+        }
     }
+
     
 
     public void ShowResult()
     {
+
         Ref_GamePlayUiManager.SetResult1_Text(TestResult(Ref_GamePlayUiManager.List1Call()).ToString());
         HighLiteCard(Ref_GamePlayUiManager.List1Call());
         Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
         HighLiteCard(Ref_GamePlayUiManager.List2Call());
         Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());
         HighLiteCard(Ref_GamePlayUiManager.List3Call());
+    }
+
+   
+
+    public IEnumerator Coundown(int Time)
+    {
+        while (Time > 0)
+        {
+            yield return new WaitForSeconds(1);
+            Ref_GamePlayUiManager.StopWatch(Time);
+            Time--;
+        }
     }
   
 }
