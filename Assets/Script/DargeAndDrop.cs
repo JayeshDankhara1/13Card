@@ -110,18 +110,7 @@ public class DargeAndDrop : MonoBehaviour
       
     }
 
-    public void SwapCard(Card card1, Card card2)
-    {
-        Color tempColor = card1.Color;
-        Name tempName = card1.Name;
 
-        card1.Color = card2.Color;
-        card1.Name = card2.Name;
-
-        card2.Color = tempColor;
-        card2.Name = tempName;
-
-    }
 
 
     public void LoadSprit(GameObject gameObject)
@@ -137,7 +126,7 @@ public class DargeAndDrop : MonoBehaviour
 
     public void SwapCard_GameObject(GameObject gameObject1, GameObject gameObject2)
     {
-        SwapCard(gameObject1.GetComponent<Card>(), gameObject2.GetComponent<Card>());
+       Ref_GamePlayManager.SwapCard(gameObject1.GetComponent<Card>(), gameObject2.GetComponent<Card>());
         LoadSprit(gameObject1);
         LoadSprit(gameObject2);
         //  Ref_GamePlayManager.Ref_GamePlayUiManager.AllCardListUpdate();

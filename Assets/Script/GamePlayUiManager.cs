@@ -41,11 +41,13 @@ public class GamePlayUiManager : MonoBehaviour
     public Color32 W_Color;
     public Color32 R_Color;
     public Color32 Y_Color;
+    public Color32 G_Color;
+
 
     public GameObject Pref_GameObject;
     
-    public Transform Parent1_GameObject;
-    public Transform Parent2_GameObject;
+    public RectTransform Parent1_GameObject;
+    public RectTransform Parent2_GameObject;
     public Transform Parent3_GameObject;
 
 
@@ -288,6 +290,7 @@ public class GamePlayUiManager : MonoBehaviour
         List2Update();
         List3Update();
         Ref_GamePlayManager.ShowResult();
+        
        
     }
 
@@ -347,9 +350,18 @@ public class GamePlayUiManager : MonoBehaviour
     }
     public void SwitchList()
     {
-        SwapGameObject();
-      //  Load_Sprit();
-       // AllCardListUpdate();
+        for (int i = 2; i <= 6; i++)
+        {
+            SwapGameObject(Find_GameObject(Parent1_GameObject, i), Find_GameObject(Parent2_GameObject, i));
+        }
+        List1Update();
+        List2Update();
+        
+       
+        //AllCardListUpdate();
+        // Ref_GamePlayManager.ShowResult();
+        //  Load_Sprit();
+        // AllCardListUpdate();
 
     }
 
@@ -373,50 +385,17 @@ public class GamePlayUiManager : MonoBehaviour
         image.color=color;
     }
 
-    public void SwapGameObject()
+    public void SwapGameObject(GameObject obj1, GameObject obj2)
     {
 
-        for (int i = 0; i < 5; i++)
-        {
-
-
-            GameObject gameObject1 = Parent1_GameObject.GetChild(i + 2).gameObject;
-            GameObject gameObject2 = Parent2_GameObject.GetChild(i + 2).gameObject;
-
-            Color color = gameObject1.GetComponent<Card>().Color;
-            Name name = gameObject1.GetComponent<Card>().Name;
-
-            gameObject1.GetComponent<Card>().Color = gameObject2.GetComponent<Card>().Color;
-            gameObject1.GetComponent<Card>().Name = gameObject2.GetComponent<Card>().Name;
-
-            gameObject2.GetComponent<Card>().Color = color;
-            gameObject2.GetComponent<Card>().Name = name;
-
-            LoadSprit(gameObject1, gameObject1.GetComponent<Card>());
-            LoadSprit(gameObject2, gameObject2.GetComponent<Card>());
-
-        }
-
-
-
-
-
-        //for (int i = 0; i < 5; i++)
-        //{ 
-        //    Color color = card1[i].Color;
-        //    Name name = card1[i].Name;
-
-        //    card1[i].Color = card2[i].Color;
-        //    card1[i].Name = card2[i].Name;
-
-        //    card2[i].Color = color;
-        //    card2[i].Name = name;
-
-
-        //}
+        Ref_GamePlayManager.SwapCard(GetCard(obj1), GetCard(obj2));
+        LoadSprit(obj1, GetCard(obj1));
+        LoadSprit(obj2, GetCard(obj2));
 
     }
 
+
+   
     public void DeHighLiteCard(List<Card> cards)
     {
         for (int i = 0; i < cards.Count; i++)

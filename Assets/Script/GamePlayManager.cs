@@ -37,8 +37,8 @@ public class GamePlayManager : MonoBehaviour
     public Vector3 Collide_GameObject_Postion1;
 
 
-    public List<Card> ResultCardList = new List<Card>();    
-
+    public List<Card> ResultCardList = new List<Card>();
+    
     // Start is called before the first frame update
 
     public void Awake()
@@ -120,6 +120,49 @@ public class GamePlayManager : MonoBehaviour
         }
         return 0;
     }
+
+    public int GetCardScore(Name name)
+    {
+
+        switch (name)
+        {
+            case Name.Ace:
+                return 150;
+            case Name.Two:
+                return 20;
+            case Name.Three:
+                return 30;
+            case Name.Four:
+                return 40;
+            case Name.Five:
+                return 50;
+            case Name.Six:
+                return 60;
+            case Name.Seven:
+                return 70;
+            case Name.Eight:
+                return 80;
+            case Name.Nine:
+                return 90;
+            case Name.Ten:
+                return 100;
+            case Name.Jack:
+                return 110;
+            case Name.Queen:
+                return 120;
+            case Name.King:
+                return 130;
+            case Name.Joker:
+                return 150;
+        }
+        return 0;
+    }
+
+    public int GetResultScore(Result name)
+    {
+        return (int)name;
+    }
+
 
     public int GetColor(Color color)
     {
@@ -516,32 +559,68 @@ public class GamePlayManager : MonoBehaviour
     {
         for (int i = 0; i < cards.Count; i++)
         {
-            for (int j = 0; j < ResultCardList.Count; j++)
+            for (int j = 0; j < Ref_GamePlayUiManager.Card_GameObjects.Count; j++)
             {
-                if (cards[i].Name == ResultCardList[j].Name && cards[i].Color == ResultCardList[j].Color)
+                if (cards[i].Name == Ref_GamePlayUiManager.Card_GameObjects[j].GetComponent<Card>().Name && cards[i].Color == Ref_GamePlayUiManager.Card_GameObjects[j].GetComponent<Card>().Color)
                 {
-                    Ref_GamePlayUiManager.GetImage_Sorce(cards[i].gameObject).color = Ref_GamePlayUiManager.Y_Color;
+                    Ref_GamePlayUiManager.GetImage_Sorce(Ref_GamePlayUiManager.Card_GameObjects[j]).color = Ref_GamePlayUiManager.Y_Color;
                 }
             }
         }
     }
 
-    
+    public int GetScore(List<Card> cards)
+    {
+        int TempScore = 0;
+        for (int i = 0; i < cards.Count; i++)
+        {
+            TempScore+= GetCardScore(cards[i].Name);
+        }
+        return TempScore;
+    }
+
+
 
     public void ShowResult()
     {
 
-        Ref_GamePlayUiManager.SetResult1_Text(TestResult(Ref_GamePlayUiManager.List1Call()).ToString());
-        HighLiteCard(Ref_GamePlayUiManager.List1Call());
+        Change_AllBg();
+        Ref_GamePlayUiManager.SetScore_Text(0);
+        ResultCardList.Clear();
 
-        Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
-        HighLiteCard(Ref_GamePlayUiManager.List2Call());
-        Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());
-        HighLiteCard(Ref_GamePlayUiManager.List3Call());
+
+        Result result1 = TestResult(Ref_GamePlayUiManager.List1Call());
+        Ref_GamePlayUiManager.SetResult1_Text(result1.ToString());
+        HighLiteCard(ResultCardList);
+        int s1 = GetScore(ResultCardList) + GetResultScore(result1);
+        Ref_GamePlayUiManager.SetScore1_Text(s1);
+
+        ResultCardList.Clear();
+        Result result2 = TestResult(Ref_GamePlayUiManager.List2Call());
+        Ref_GamePlayUiManager.SetResult2_Text(result2.ToString());
+        HighLiteCard(ResultCardList);
+        int s2 = GetScore(ResultCardList) + GetResultScore(result2);
+        Ref_GamePlayUiManager.SetScore2_Text(s2);
+        
+        ResultCardList.Clear();
+        Result result3 = TestResult(Ref_GamePlayUiManager.List3Call());
+        Ref_GamePlayUiManager.SetResult3_Text(result3.ToString());
+        HighLiteCard(ResultCardList);
+        int s3 = GetScore(ResultCardList) + GetResultScore(result3);
+        Ref_GamePlayUiManager.SetScore3_Text(GetScore(ResultCardList) + GetResultScore(result3));
+
+        Ref_GamePlayUiManager.SetScore_Text(s1 + (s2 * 2) + (s3 * 3));
+        Change_Bg(s1, s2, s3);
+        
+
+
+        //Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
+        //HighLiteCard(Ref_GamePlayUiManager.List2Call());
+        //Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());
+        //HighLiteCard(Ref_GamePlayUiManager.List3Call());
     }
 
    
-
     public IEnumerator Coundown(int Time)
     {
         while (Time > 0)
@@ -551,5 +630,37 @@ public class GamePlayManager : MonoBehaviour
             Time--;
         }
     }
-  
+
+    public void Change_Bg(int s1, int s2, int s3)
+    {
+        if (s1 < s2)
+        {
+            Ref_GamePlayUiManager.GetImage_Sorce2().color = Ref_GamePlayUiManager.R_Color;
+        }
+        if (s2 < s3)
+        {
+            Ref_GamePlayUiManager.GetImage_Sorce3().color = Ref_GamePlayUiManager.R_Color;
+        }
+    }
+
+    public void Change_AllBg()
+    {
+        Ref_GamePlayUiManager.GetImage_Sorce1().color = Ref_GamePlayUiManager.G_Color;
+        Ref_GamePlayUiManager.GetImage_Sorce2().color = Ref_GamePlayUiManager.G_Color;
+        Ref_GamePlayUiManager.GetImage_Sorce3().color = Ref_GamePlayUiManager.G_Color;
+    }
+
+    public void SwapCard(Card card1, Card card2)
+    {
+        Color tempColor = card1.Color;
+        Name tempName = card1.Name;
+
+        card1.Color = card2.Color;
+        card1.Name = card2.Name;
+
+        card2.Color = tempColor;
+        card2.Name = tempName;
+
+    }
+
 }

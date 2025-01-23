@@ -33,5 +33,8 @@ public class GamePlayButtonManager : MonoBehaviour
     public void SwitchButton_Click()
     {
         Ref_GamePlayManager.Ref_GamePlayUiManager.SwitchList();
+        Ref_GamePlayManager.Ref_GamePlayUiManager.DeHighliteAllCard();
+        Ref_GamePlayManager.ShowResult();
+
     }
 }
