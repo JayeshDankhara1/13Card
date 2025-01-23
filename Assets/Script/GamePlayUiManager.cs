@@ -151,7 +151,7 @@ public class GamePlayUiManager : MonoBehaviour
 
     public Card LoadRendomCard(int i)
     {
-        if (i==2)
+        if (i==10)
         {
 
             Color color = Color.Null;
@@ -161,10 +161,10 @@ public class GamePlayUiManager : MonoBehaviour
         }
         else
         {
-            Color color = Color.Spades;
-            Name name = (Name)i;
-            Card card = new Card(color, name);
-            //  Card card = new Card((Color)Random.Range(0, 4), (Name)Random.Range(0, 13));
+            //Color color = Color.Spades;
+            //Name name = (Name)i;
+            //Card card = new Card(color, name);
+             Card card = new Card((Color)Random.Range(0, 4), (Name)Random.Range(0, 13));
 
             return card;
         }

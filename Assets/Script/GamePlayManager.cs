@@ -47,7 +47,7 @@ public class GamePlayManager : MonoBehaviour
     }
     public void Start()
     {
-       // StartCoroutine(GameStart());
+        StartCoroutine(GameStart());
     
     }
 
@@ -306,7 +306,7 @@ public class GamePlayManager : MonoBehaviour
                 continue;
             }
             
-            else if (cards[i].Name == Name.Ace && cards[0].Name == Name.Two && !isAceLow)
+            else if (cards[i].Name == Name.Ace && (cards[0].Name == Name.Two || cards[0].Name == Name.Three || cards[0].Name == Name.Four || cards[0].Name == Name.Five || cards[0].Name == Name.Six) && !isAceLow)
             {
                 isAceLow = true;
                 continue;
@@ -533,6 +533,7 @@ public class GamePlayManager : MonoBehaviour
 
         Ref_GamePlayUiManager.SetResult1_Text(TestResult(Ref_GamePlayUiManager.List1Call()).ToString());
         HighLiteCard(Ref_GamePlayUiManager.List1Call());
+
         Ref_GamePlayUiManager.SetResult2_Text(TestResult(Ref_GamePlayUiManager.List2Call()).ToString());
         HighLiteCard(Ref_GamePlayUiManager.List2Call());
         Ref_GamePlayUiManager.SetResult3_Text(TestResult(Ref_GamePlayUiManager.List3Call()).ToString());

@@ -630,7 +630,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Color: 0
-  Name: 3
+  Name: 4
 --- !u!4 &859821415
 Transform:
   m_ObjectHideFlags: 0
