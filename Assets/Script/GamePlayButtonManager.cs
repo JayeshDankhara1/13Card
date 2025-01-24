@@ -5,19 +5,8 @@ using UnityEngine;
 public class GamePlayButtonManager : MonoBehaviour
 {
     public GamePlayManager Ref_GamePlayManager;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
+    #region function
     public void ButtonControl(string Btn_Name)
     {
 
@@ -37,4 +26,5 @@ public class GamePlayButtonManager : MonoBehaviour
         Ref_GamePlayManager.ShowResult();
 
     }
+    #endregion
 }

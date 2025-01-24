@@ -8,32 +8,29 @@ using UnityEngine.UI;
 public class DargeAndDrop : MonoBehaviour
 {
 
-
+    #region Varibal And Refrance Script varibal
+    public Canvas Canvas;
+    [HideInInspector]
+    public GamePlayManager Ref_GamePlayManager;
     Vector3 MousePostionOffset;
     Vector3 TransformPostion;
     Vector3 CollidGameObjectPostion;
+    GameObject ThisGameObject=null;
+    GameObject CollidGameObject=null;
+    bool IsRaning = false;
+    bool IsCollide = false;
 
-    public Canvas Canvas;
-    
-    public GamePlayManager Ref_GamePlayManager;
+    #endregion
 
-
-    public GameObject ThisGameObject=null;
-    public GameObject CollidGameObject=null;
-
-    public bool IsRaning = false;
-    public bool IsCollide = false;
-
+    #region Unity Function
     public void Start()
     {
         Ref_GamePlayManager = GamePlayManager.instance;
     }
 
-    public Vector3 GetMousePostion()
-    {
-        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    }
+    #endregion
 
+    #region Darg Function
     public void OnMouseDown()
     {
         IsRaning = true;
@@ -50,8 +47,6 @@ public class DargeAndDrop : MonoBehaviour
         transform.position = GetMousePostion() + MousePostionOffset;
 
     }
-
-
 
 
     public void OnMouseUp()
@@ -80,12 +75,9 @@ public class DargeAndDrop : MonoBehaviour
         HighLiteCard(transform.transform, 1f);
     }
 
+    #endregion
 
-    public void OnTriggerEnter2D(Collider2D collision)
-    {
-        
-    }
-
+    #region Collide Dection Reletad Function
     public void OnTriggerStay2D(Collider2D collision)
     {
         if (IsRaning && !IsCollide)
@@ -109,16 +101,14 @@ public class DargeAndDrop : MonoBehaviour
         }
       
     }
+    #endregion
 
-
-
-
+    #region other Function
     public void LoadSprit(GameObject gameObject)
     {
         gameObject.GetComponent<Image>().sprite = Ref_GamePlayManager.Ref_GamePlayUiManager.Card_Sprite[Ref_GamePlayManager.Ref_GamePlayUiManager.GetCardIndex(gameObject.GetComponent<Card>())];
 
     }
-
     public void HighLiteCard(Transform transform, float Scale)
     {
         transform.localScale = Vector3.one * Scale;
@@ -129,35 +119,17 @@ public class DargeAndDrop : MonoBehaviour
        Ref_GamePlayManager.SwapCard(gameObject1.GetComponent<Card>(), gameObject2.GetComponent<Card>());
         LoadSprit(gameObject1);
         LoadSprit(gameObject2);
-        //  Ref_GamePlayManager.Ref_GamePlayUiManager.AllCardListUpdate();
-        //   Transform parent1 = gameObject1.transform.parent;
-        //   Transform parent2 = gameObject2.transform.parent;
-        //   int siblingIndex1 = gameObject1.transform.GetSiblingIndex();
-        //   int siblingIndex2 = gameObject2.transform.GetSiblingIndex();
-
-
-        //   //   gameObject1.transform.SetSiblingIndex(-1);
-        //   //  gameObject2.transform.SetSiblingIndex(-1);
-
-
-
-
-        ////   gameObject1.transform.localPosition = gameObject1_Postion;
-        //  // gameObject2.transform.localPosition = gameObject2_Postion;
-
-        //   gameObject1.transform.SetParent(parent2);
-        //   gameObject2.transform.SetParent(parent1);
-        //   gameObject1.transform.SetSiblingIndex(siblingIndex2);
-        //   gameObject2.transform.SetSiblingIndex(siblingIndex1);
-
+      
         HighLiteCard(gameObject1.transform, 1f);
         HighLiteCard(gameObject2.transform, 1f);
 
-        //   LayoutRebuilder.ForceRebuildLayoutImmediate(parent.GetComponent<RectTransform>());
-
+    }
+    public Vector3 GetMousePostion()
+    {
+        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
-
+    #endregion
 }
 
 

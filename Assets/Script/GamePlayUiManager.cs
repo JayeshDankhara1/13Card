@@ -6,74 +6,80 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GamePlayUiManager : MonoBehaviour
 {
-
+    #region Refarance Varibal 
     public List <Sprite> Card_Sprite = new List <Sprite>();
-   // public List<Image> Card_Image = new List <Image>();
+    [HideInInspector]
     public List<Card> cards = new List<Card>();
     public List <GameObject>Card_GameObjects = new List<GameObject>();
+    [HideInInspector]
     public List <Card> Card_List1 = new List<Card>();
+    [HideInInspector]
     public List<Card> Card_List2 = new List<Card>();
+    [HideInInspector]
     public List<Card> Card_List3 = new List<Card>();
 
-    [Header("Text")]
+    [Header("Hader")]
     public GameObject HaderParent;
-    public GameObject Tabel;
-    [Space]
-    public TextMeshProUGUI Result1_Text;
-    public TextMeshProUGUI Result2_Text;
-    public TextMeshProUGUI Result3_Text;
-    [Space]
-    public TextMeshProUGUI Score1_Text;
-    public TextMeshProUGUI Score2_Text;
-    public TextMeshProUGUI Score3_Text;
-    [Space]
     public TextMeshProUGUI Score_text;
     public TextMeshProUGUI StopWatch_text;
     public TextMeshProUGUI CounDowan_Text;
+
     [Space]
+    [Header("Table")]
+    public GameObject Tabel;
+    [Space]
+    [Space]
+    public RectTransform Parent1_GameObject;
+    public TextMeshProUGUI Result1_Text;
+    public TextMeshProUGUI Score1_Text;
     public Image Image_sorce1;
+    [Space]
+    [Space]
+    public RectTransform Parent2_GameObject;
+    public TextMeshProUGUI Result2_Text;
+    public TextMeshProUGUI Score2_Text;
     public Image Image_sorce2;
+    [Space]
+    [Space]
+    public Transform Parent3_GameObject;
+    public TextMeshProUGUI Result3_Text;
+    public TextMeshProUGUI Score3_Text;
     public Image Image_sorce3;
     [Space]
+    [Space]
+    [Header("Color")]
     public Color32 W_Color;
     public Color32 R_Color;
     public Color32 Y_Color;
     public Color32 G_Color;
-
-
+    [Space]
+    [Header("Card")]
     public GameObject Pref_GameObject;
     
-    public RectTransform Parent1_GameObject;
-    public RectTransform Parent2_GameObject;
-    public Transform Parent3_GameObject;
-
-
 
     public static GamePlayUiManager Instance;
+    [HideInInspector]
     public GamePlayManager Ref_GamePlayManager;
+    #endregion
 
+    #region unity function
     public void Awake()
     {
         Instance = this;
     }
-    // Start is called before the first frame update
     void Start()
     {
-        // DeavtiveCard();
+        Ref_GamePlayManager = GamePlayManager.instance;
         GameStart();
         
     }
+    #endregion
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
+    #region Other Function
     public void CounDownTaxtUpdate(string Text)
     {
         CounDowan_Text.text = Text;
@@ -98,57 +104,34 @@ public class GamePlayUiManager : MonoBehaviour
         {
             SetCardData(GetCard(Card_GameObjects[i]), cards[i].Color, cards[i].Name);
             LoadSprit(Card_GameObjects[i], GetCard(Card_GameObjects[i]));
-            ActiveObject(Card_GameObjects[i]);
+           
         }
     }
     public void ActiveObject(GameObject gameObject)
     {
         gameObject.SetActive(true);
     }
-
+    public void DeactiveAllCard()
+    {
+        for (int i = 0; i < Card_GameObjects.Count; i++)
+        {
+            DeaciveObject(Card_GameObjects[i]);
+        }
+    }
     public void DeaciveObject(GameObject gameObject)
     { 
         gameObject.SetActive(false);
     }
 
-    public void CreatCard_GameObjectList()
-    {
-       // Card_GameObjects.Clear();
-        for(int i=0; i<Card_GameObjects.Count;i++)
-        {
-            //Card_GameObject();
-        }
-    }
-
-    public void Card_GameObject()
-    {
-
-        //GameObject TempGameObject = Instantiate(Pref_GameObject, SetTrnform(Card_GameObjects.Count));
-        //DeaciveObject(TempGameObject);
-        //Card_GameObjects.Add(TempGameObject);
-    }
-
-    public Transform SetTrnform(int Count)
-    {
-        if (Count < 5)
-        {
-            return Parent1_GameObject;
-        }
-        else if (Count < 10)
-        {
-            return Parent2_GameObject;
-        }
-        else
-        {
-            return Parent3_GameObject;
-        }
-
-    }
+   
+   
     
     
     public void LoadSprit(GameObject gameObject, Card card)
     {
+       
         gameObject.GetComponent<Image>().sprite = Card_Sprite[GetCardIndex(card)];
+
     }
 
     public Card LoadRendomCard(int i)
@@ -163,9 +146,7 @@ public class GamePlayUiManager : MonoBehaviour
         }
         else
         {
-            //Color color = Color.Spades;
-            //Name name = (Name)i;
-            //Card card = new Card(color, name);
+          
              Card card = new Card((Color)Random.Range(0, 4), (Name)Random.Range(0, 13));
 
             return card;
@@ -225,14 +206,13 @@ public class GamePlayUiManager : MonoBehaviour
 
     public void GameStart()
     {
+        DeactiveAllCard();
         CreatCardList();
-       // CreatCard_GameObjectList();
-        
+     
     }
 
     public Card Find_Card(Transform transform , int Index)
     {
-        
 
         return transform.GetChild(Index).GetComponent<Card>(); 
     }
@@ -330,23 +310,23 @@ public class GamePlayUiManager : MonoBehaviour
         StopWatch_text.text = MM.ToString("00") +":"+ SS.ToString("00");
     }
     public void SetScore_Text(int score)
-    {
-        Score_text.text = score.ToString();
+    { 
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(score, 0, Score_text);
     }
 
     public void SetScore1_Text(int Score)
-    { 
-        Score1_Text.text = Score.ToString() + " X 1";
+    {
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(Score, 0, Score1_Text," X 1");
     }
 
     public void SetScore2_Text(int Score)
     {
-        Score2_Text.text = Score.ToString() + " X 2";
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(Score, 0, Score2_Text, " X 2");
     }
 
     public void SetScore3_Text(int Score)
     {
-        Score3_Text.text = Score.ToString() + " X 3";
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(Score, 0, Score3_Text, " X 3");
     }
     public void SwitchList()
     {
@@ -356,13 +336,7 @@ public class GamePlayUiManager : MonoBehaviour
         }
         List1Update();
         List2Update();
-        
        
-        //AllCardListUpdate();
-        // Ref_GamePlayManager.ShowResult();
-        //  Load_Sprit();
-        // AllCardListUpdate();
-
     }
 
     public Image GetImage_Sorce1()
@@ -380,11 +354,7 @@ public class GamePlayUiManager : MonoBehaviour
         return Image_sorce3;
     }
 
-    public void SetColor(Image image, Color32 color)
-    { 
-        image.color=color;
-    }
-
+   
     public void SwapGameObject(GameObject obj1, GameObject obj2)
     {
 
@@ -395,7 +365,6 @@ public class GamePlayUiManager : MonoBehaviour
     }
 
 
-   
     public void DeHighLiteCard(List<Card> cards)
     {
         for (int i = 0; i < cards.Count; i++)
@@ -404,21 +373,6 @@ public class GamePlayUiManager : MonoBehaviour
         }
     }
 
-    public void Load_Sprit()
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            if (i < 5)
-            {
-                LoadSprit(Find_GameObject(Parent1_GameObject,i+2), Card_List1[i]);
-            }
-            else
-            {
-                LoadSprit(Find_GameObject(Parent2_GameObject, i-5+2), Card_List2[i-5]);
-            }
-        }
-        
-    }
 
     public void TabelSetActive(bool active) 
     {
@@ -435,5 +389,6 @@ public class GamePlayUiManager : MonoBehaviour
         int ss = Seconds-(mm*60);
         SetStopWatch_Text(mm,ss);
     }
+    #endregion
 
 }
