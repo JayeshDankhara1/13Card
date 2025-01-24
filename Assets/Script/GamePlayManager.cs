@@ -1,5 +1,6 @@
 
 using DG.Tweening;
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +39,8 @@ public class GamePlayManager : MonoBehaviour
     public GoogleAds Ref_GoogleAds;
     [HideInInspector]
     public List<Card> ResultCardList = new List<Card>();
+
+    int Result1_Score=0, Result2_Score=0, Result3_Score=0;
     #endregion
 
     #region Unity Function
@@ -51,7 +54,7 @@ public class GamePlayManager : MonoBehaviour
         Ref_Animation = Animation.instance;
         Ref_GoogleAds = GoogleAds.instance;
         Ref_GamePlayUiManager = GamePlayUiManager.Instance;
-        StartCoroutine(GameStart());
+        GameSatrt();
     }
     #endregion
 
@@ -68,37 +71,50 @@ public class GamePlayManager : MonoBehaviour
         Result result1 = TestResult(Ref_GamePlayUiManager.List1Call());
         Ref_GamePlayUiManager.SetResult1_Text(result1.ToString());
         HighLiteCard(ResultCardList);
-        int s1 = CalculetScore(ResultCardList) + GetResultScore(result1);
-        Ref_GamePlayUiManager.SetScore1_Text(s1);
+        Result1_Score = CalculetScore(ResultCardList) + GetResultScore(result1);
+        Ref_GamePlayUiManager.SetScore1_Text(Result1_Score);
 
         ResultCardList.Clear();
         Result result2 = TestResult(Ref_GamePlayUiManager.List2Call());
         Ref_GamePlayUiManager.SetResult2_Text(result2.ToString());
         HighLiteCard(ResultCardList);
-        int s2 = CalculetScore(ResultCardList) + GetResultScore(result2);
-        Ref_GamePlayUiManager.SetScore2_Text(s2);
+        Result2_Score = CalculetScore(ResultCardList) + GetResultScore(result2);
+        Ref_GamePlayUiManager.SetScore2_Text(Result2_Score);
 
         ResultCardList.Clear();
         Result result3 = TestResult(Ref_GamePlayUiManager.List3Call());
         Ref_GamePlayUiManager.SetResult3_Text(result3.ToString());
         HighLiteCard(ResultCardList);
-        int s3 = CalculetScore(ResultCardList) + GetResultScore(result3);
+        Result3_Score = CalculetScore(ResultCardList) + GetResultScore(result3);
         Ref_GamePlayUiManager.SetScore3_Text(CalculetScore(ResultCardList) + GetResultScore(result3));
 
-        Ref_GamePlayUiManager.SetScore_Text(s1 + (s2 * 2) + (s3 * 3));
-        Change_Bg(s1, s2, s3);
+        Ref_GamePlayUiManager.SetScore_Text(Result1_Score + (Result2_Score * 2) + (Result3_Score * 3));
+        Change_Bg(Result1_Score, Result2_Score, Result3_Score);
+
 
     }
 
+    public bool Check_Score()
+    {
+        if (Result1_Score > Result2_Score && Result2_Score > Result3_Score)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     public IEnumerator Coundown(int Time)
     {
         while (Time > 0)
         {
-            yield return new WaitForSeconds(1);
             Ref_GamePlayUiManager.StopWatch(Time);
+            yield return new WaitForSeconds(1);
             Time--;
         }
+        Ref_GamePlayUiManager.GameOver("You Are Loss!");
     }
 
     public Result TestResult(List<Card> cards)
@@ -173,11 +189,10 @@ public class GamePlayManager : MonoBehaviour
         card2.Name = tempName;
 
     }
-    public IEnumerator GameStart()
+    public IEnumerator start()
     {
-        Ref_GamePlayUiManager.TabelSetActive(false);
-        Ref_GamePlayUiManager.HedarParentSetActive(false);
-        Ref_GamePlayUiManager.CounDowan(true);
+
+        Ref_GamePlayUiManager.GameSatrt();
         for (int i = 3; i >= 0; i--)
         {
             if (i == 0)
@@ -198,10 +213,22 @@ public class GamePlayManager : MonoBehaviour
         yield return new WaitForSeconds(3.7f);
         Ref_GamePlayUiManager.LoadCard();
         Ref_GamePlayUiManager.AllCardListUpdate();
+        Ref_GamePlayUiManager.start(true);
         Ref_GoogleAds.ShowBannerAd();
 
     }
 
+    public void GameSatrt()
+    {
+        Ref_GamePlayUiManager.GameStart();
+        StartCoroutine(start());
+    }
+    public void GameOver()
+    {
+        StopAllCoroutines();
+        Ref_GamePlayUiManager.start(false);
+        Ref_GamePlayUiManager.Restart(true);
+    }
 
     public IEnumerator CardDeail()
     {
@@ -631,6 +658,7 @@ public class GamePlayManager : MonoBehaviour
             Ref_GamePlayUiManager.GetImage_Sorce3().color = Ref_GamePlayUiManager.R_Color;
         }
     }
+
 
     public void Change_AllBg()
     {

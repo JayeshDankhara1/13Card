@@ -59,11 +59,20 @@ public class GamePlayUiManager : MonoBehaviour
     [Space]
     [Header("Card")]
     public GameObject Pref_GameObject;
-    
+    [Space]
+    [Header("Game Over")]
+    public GameObject Partical_Parent;
+    public GameObject WinText;
 
     public static GamePlayUiManager Instance;
     [HideInInspector]
     public GamePlayManager Ref_GamePlayManager;
+
+    [Space]
+    [Header("Button")]
+    public GameObject StartButton;
+    public GameObject RestartButton;
+
     #endregion
 
     #region unity function
@@ -74,7 +83,7 @@ public class GamePlayUiManager : MonoBehaviour
     void Start()
     {
         Ref_GamePlayManager = GamePlayManager.instance;
-        GameStart();
+       
         
     }
     #endregion
@@ -206,9 +215,21 @@ public class GamePlayUiManager : MonoBehaviour
 
     public void GameStart()
     {
+
+        //start(true);
+        Restart(false);
         DeactiveAllCard();
         CreatCardList();
      
+    }
+
+    public void start(bool isActive)
+    {
+        StartButton.SetActive(isActive);
+    }
+    public void Restart(bool IsActive)
+    {
+        RestartButton.SetActive(IsActive);
     }
 
     public Card Find_Card(Transform transform , int Index)
@@ -388,6 +409,37 @@ public class GamePlayUiManager : MonoBehaviour
         int mm = Seconds / 60;
         int ss = Seconds-(mm*60);
         SetStopWatch_Text(mm,ss);
+    }
+
+    public void GameSatrt()
+    {
+        ChageAllBg();
+        Partical_Parent.SetActive(false);
+        WinTextSetActive(false);
+        start(false);
+        TabelSetActive(false);
+        HedarParentSetActive(false);
+        CounDowan(true);
+    }
+    public void GameOver(string text,bool IsPaticl=false)
+    {
+        WinText.GetComponent<TextMeshProUGUI>().text = text;
+        if (IsPaticl) { Partical_Parent.SetActive(true); }
+        WinTextSetActive(true);
+        TabelSetActive(false);
+        HedarParentSetActive(false);
+    }
+
+    public void WinTextSetActive(bool active)
+    {
+        WinText.SetActive(active);
+    }
+
+    public void ChageAllBg()
+    {
+        GetImage_Sorce1().color = G_Color;
+        GetImage_Sorce2().color = G_Color;
+        GetImage_Sorce3().color = G_Color;
     }
     #endregion
 

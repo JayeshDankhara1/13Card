@@ -350,6 +350,7 @@ public class GoogleAds : MonoBehaviour
 
     public void ShowRewardedAd()
     {
+        DestroyBannerAd();
         if (rewardedAd != null && rewardedAd.CanShowAd())
         {
           //  Debug.Log("reward Ad Show");
