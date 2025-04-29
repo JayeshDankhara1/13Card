@@ -5,19 +5,8 @@ using UnityEngine;
 public class GamePlayButtonManager : MonoBehaviour
 {
     public GamePlayManager Ref_GamePlayManager;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
+    #region function
     public void ButtonControl(string Btn_Name)
     {
 
@@ -26,6 +15,12 @@ public class GamePlayButtonManager : MonoBehaviour
             case "Switch":
                 SwitchButton_Click();
                 break;
+            case "Submit":
+                GameOver();
+                break;
+            case "Restart":
+                GameStart();
+                break;
 
            }
     }
@@ -33,5 +28,28 @@ public class GamePlayButtonManager : MonoBehaviour
     public void SwitchButton_Click()
     {
         Ref_GamePlayManager.Ref_GamePlayUiManager.SwitchList();
+        Ref_GamePlayManager.Ref_GamePlayUiManager.DeHighliteAllCard();
+        Ref_GamePlayManager.ShowResult();
+
     }
+
+    public void GameOver()
+    {
+        Ref_GamePlayManager.GameOver();
+        if (Ref_GamePlayManager.Check_Score())
+        {
+            Ref_GamePlayManager.Ref_GamePlayUiManager.GameOver("You Are Win !",true);
+        }
+        else
+        {
+            Ref_GamePlayManager.Ref_GamePlayUiManager.GameOver("You Are Loss !");
+        }
+    }
+
+    public void GameStart()
+    {
+        Ref_GamePlayManager.Ref_GoogleAds.ShowRewardedAd();
+        Ref_GamePlayManager.GameSatrt();
+    }
+    #endregion
 }

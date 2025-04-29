@@ -10,12 +10,13 @@ public enum Color
     Diamonds,
     Clubs,
     Hearts,
-    Spades
+    Spades,
+    Null
 }
 [Serializable]
 public enum Name
 {
-    Ace,
+    
     Two,
     Three,
     Four,
@@ -27,12 +28,16 @@ public enum Name
     Ten,
     Jack,
     Queen,
-    King
+    King,
+    Ace,
+    Joker
 }
 [Serializable]
 public class Card : MonoBehaviour
-{ 
+{
+    [SerializeField] 
     public Color Color;
+    [SerializeField]
     public Name Name;
 
    public Card(Color color, Name name)

@@ -1,60 +1,94 @@
-using System.Collections;
+
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager.Requests;
+
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using Unity.VisualScripting;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GamePlayUiManager : MonoBehaviour
 {
-
-    public TextMeshProUGUI CounDowan_Text;
+    #region Refarance Varibal 
     public List <Sprite> Card_Sprite = new List <Sprite>();
-   // public List<Image> Card_Image = new List <Image>();
+    [HideInInspector]
     public List<Card> cards = new List<Card>();
     public List <GameObject>Card_GameObjects = new List<GameObject>();
-    
+    [HideInInspector]
     public List <Card> Card_List1 = new List<Card>();
+    [HideInInspector]
     public List<Card> Card_List2 = new List<Card>();
+    [HideInInspector]
     public List<Card> Card_List3 = new List<Card>();
 
+    [Header("Hader")]
+    public GameObject HaderParent;
+    public TextMeshProUGUI Score_text;
+    public TextMeshProUGUI StopWatch_text;
+    public TextMeshProUGUI CounDowan_Text;
+
+    [Space]
+    [Header("Table")]
+    public GameObject Tabel;
+    [Space]
+    [Space]
+    public RectTransform Parent1_GameObject;
     public TextMeshProUGUI Result1_Text;
+    public TextMeshProUGUI Score1_Text;
+    public Image Image_sorce1;
+    [Space]
+    [Space]
+    public RectTransform Parent2_GameObject;
     public TextMeshProUGUI Result2_Text;
-    public TextMeshProUGUI Result3_Text;
-
-
-
-    public GameObject Pref_GameObject;
-    
-    public Transform Parent1_GameObject;
-    public Transform Parent2_GameObject;
+    public TextMeshProUGUI Score2_Text;
+    public Image Image_sorce2;
+    [Space]
+    [Space]
     public Transform Parent3_GameObject;
-
+    public TextMeshProUGUI Result3_Text;
+    public TextMeshProUGUI Score3_Text;
+    public Image Image_sorce3;
+    [Space]
+    [Space]
+    [Header("Color")]
+    public Color32 W_Color;
+    public Color32 R_Color;
+    public Color32 Y_Color;
+    public Color32 G_Color;
+    [Space]
+    [Header("Card")]
+    public GameObject Pref_GameObject;
+    [Space]
+    [Header("Game Over")]
+    public GameObject Partical_Parent;
+    public GameObject WinText;
 
     public static GamePlayUiManager Instance;
+    [HideInInspector]
     public GamePlayManager Ref_GamePlayManager;
 
+    [Space]
+    [Header("Button")]
+    public GameObject StartButton;
+    public GameObject RestartButton;
+
+    #endregion
+
+    #region unity function
     public void Awake()
     {
         Instance = this;
     }
-    // Start is called before the first frame update
     void Start()
     {
-        // DeavtiveCard();
-        GameStart();
+        Ref_GamePlayManager = GamePlayManager.instance;
+       
         
     }
+    #endregion
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
+    #region Other Function
     public void CounDownTaxtUpdate(string Text)
     {
         CounDowan_Text.text = Text;
@@ -68,7 +102,7 @@ public class GamePlayUiManager : MonoBehaviour
 
     public int GetCardIndex(Card card)
     {
-        return (Ref_GamePlayManager.GetColor(card.Color)) + (Ref_GamePlayManager.GetValue(card.Name) - 2);
+        return card.Name==Name.Joker ? 52: (Ref_GamePlayManager.GetColor(card.Color)) + (Ref_GamePlayManager.GetValue(card.Name) - 2);
     }
 
     
@@ -79,62 +113,54 @@ public class GamePlayUiManager : MonoBehaviour
         {
             SetCardData(GetCard(Card_GameObjects[i]), cards[i].Color, cards[i].Name);
             LoadSprit(Card_GameObjects[i], GetCard(Card_GameObjects[i]));
-            ActiveObject(Card_GameObjects[i]);
+           
         }
     }
     public void ActiveObject(GameObject gameObject)
     {
         gameObject.SetActive(true);
     }
-
+    public void DeactiveAllCard()
+    {
+        for (int i = 0; i < Card_GameObjects.Count; i++)
+        {
+            DeaciveObject(Card_GameObjects[i]);
+        }
+    }
     public void DeaciveObject(GameObject gameObject)
     { 
         gameObject.SetActive(false);
     }
 
-    public void CreatCard_GameObjectList()
-    {
-        Card_GameObjects.Clear();
-        while (Card_GameObjects.Count < 13)
-        {
-            Card_GameObject();
-        }
-    }
-
-    public void Card_GameObject()
-    {
-        GameObject TempGameObject = Instantiate(Pref_GameObject, SetTrnform(Card_GameObjects.Count));
-        DeaciveObject(TempGameObject);
-        Card_GameObjects.Add(TempGameObject);
-    }
-
-    public Transform SetTrnform(int Count)
-    {
-        if (Count < 5)
-        {
-            return Parent1_GameObject;
-        }
-        else if (Count < 10)
-        {
-            return Parent2_GameObject;
-        }
-        else
-        {
-            return Parent3_GameObject;
-        }
-
-    }
+   
+   
     
     
     public void LoadSprit(GameObject gameObject, Card card)
     {
+       
         gameObject.GetComponent<Image>().sprite = Card_Sprite[GetCardIndex(card)];
+
     }
 
-    public Card LoadRendomCard()
+    public Card LoadRendomCard(int i)
     {
-       Card card = new Card((Color)Random.Range(0, 4), (Name)Random.Range(0, 13));
-        return card;
+        if (i==10)
+        {
+
+            Color color = Color.Null;
+            Name name = Name.Joker;
+            Card card = new Card(color, name);
+            return card;
+        }
+        else
+        {
+          
+             Card card = new Card((Color)Random.Range(0, 4), (Name)Random.Range(0, 13));
+
+            return card;
+        }
+    
 
     }
     public Card GetCard(GameObject gameObject)
@@ -152,10 +178,12 @@ public class GamePlayUiManager : MonoBehaviour
    
     public void CreatCardList()
     {
+        int i = 0;
         cards.Clear();
         while (cards.Count < 13)
         {
-            CreatCard(LoadRendomCard());
+            CreatCard(LoadRendomCard(i));
+            i++;
         }
     }
 
@@ -187,16 +215,32 @@ public class GamePlayUiManager : MonoBehaviour
 
     public void GameStart()
     {
+
+        //start(true);
+        Restart(false);
+        DeactiveAllCard();
         CreatCardList();
-        CreatCard_GameObjectList();
-        
+     
+    }
+
+    public void start(bool isActive)
+    {
+        StartButton.SetActive(isActive);
+    }
+    public void Restart(bool IsActive)
+    {
+        RestartButton.SetActive(IsActive);
     }
 
     public Card Find_Card(Transform transform , int Index)
     {
-        
 
         return transform.GetChild(Index).GetComponent<Card>(); 
+    }
+
+    public Image GetImage_Sorce(GameObject gameObject)
+    { 
+        return gameObject.GetComponent<Image>();
     }
 
     public GameObject Find_GameObject(Transform transform, int Index)
@@ -210,7 +254,7 @@ public class GamePlayUiManager : MonoBehaviour
 
         for (int i = 0; i < 5; i++)
         {
-            Card_List1.Add(Find_Card(Parent1_GameObject, i));
+            Card_List1.Add(Find_Card(Parent1_GameObject, i+2));
         }
     }
 
@@ -220,7 +264,7 @@ public class GamePlayUiManager : MonoBehaviour
 
         for (int i = 0; i < 5; i++)
         {
-            Card_List2.Add(Find_Card(Parent2_GameObject, i));
+            Card_List2.Add(Find_Card(Parent2_GameObject, i+2));
         }
     }
     public void List3Update()
@@ -229,16 +273,25 @@ public class GamePlayUiManager : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
         {
-            Card_List3.Add(Find_Card(Parent3_GameObject, i));
+            Card_List3.Add(Find_Card(Parent3_GameObject, i + 2));
         }
     }
 
+    public void DeHighliteAllCard()
+    {
+        DeHighLiteCard(List1Call());
+        DeHighLiteCard(List2Call());
+        DeHighLiteCard(List3Call());
+
+    }
     public void AllCardListUpdate()
     {
+
         List1Update();
         List2Update();
         List3Update();
         Ref_GamePlayManager.ShowResult();
+        
        
     }
 
@@ -257,8 +310,10 @@ public class GamePlayUiManager : MonoBehaviour
         return Card_List3;
     }
 
+    
+
     public void SetResult1_Text(string text)
-    { 
+    {
         Result1_Text.text = text;
     }
 
@@ -271,49 +326,121 @@ public class GamePlayUiManager : MonoBehaviour
         Result3_Text.text = text;
     }
 
-    public void SwitchList()
+    public void SetStopWatch_Text(int MM = 0, int SS = 0)
     {
-        SwapCard(List1Call(), List2Call());
-        Load_Sprit();
-        AllCardListUpdate();
-
+        StopWatch_text.text = MM.ToString("00") +":"+ SS.ToString("00");
+    }
+    public void SetScore_Text(int score)
+    { 
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(score, 0, Score_text);
     }
 
-
-    public void SwapCard(List<Card> card1, List<Card> card2)
+    public void SetScore1_Text(int Score)
     {
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(Score, 0, Score1_Text," X 1");
+    }
 
-        for (int i = 0; i < card1.Count; i++)
-        { 
-            Color color = card1[i].Color;
-            Name name = card1[i].Name;
+    public void SetScore2_Text(int Score)
+    {
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(Score, 0, Score2_Text, " X 2");
+    }
 
-            card1[i].Color = card2[i].Color;
-            card1[i].Name = card2[i].Name;
-
-            card2[i].Color = color;
-            card2[i].Name = name;
-
-
+    public void SetScore3_Text(int Score)
+    {
+        Ref_GamePlayManager.Ref_Animation.ScoreUpdate(Score, 0, Score3_Text, " X 3");
+    }
+    public void SwitchList()
+    {
+        for (int i = 2; i <= 6; i++)
+        {
+            SwapGameObject(Find_GameObject(Parent1_GameObject, i), Find_GameObject(Parent2_GameObject, i));
         }
+        List1Update();
+        List2Update();
        
     }
 
-    public void Load_Sprit()
+    public Image GetImage_Sorce1()
     {
-        for (int i = 0; i < 10; i++)
-        {
-            if (i < 5)
-            {
-                LoadSprit(Find_GameObject(Parent1_GameObject,i), Card_List1[i]);
-            }
-            else
-            {
-                LoadSprit(Find_GameObject(Parent2_GameObject, i-5), Card_List2[i-5]);
-            }
-        }
-        
+        return Image_sorce1;
     }
 
-  
+    public Image GetImage_Sorce2()
+    {
+        return Image_sorce2;
+    }
+
+    public Image GetImage_Sorce3()
+    {
+        return Image_sorce3;
+    }
+
+   
+    public void SwapGameObject(GameObject obj1, GameObject obj2)
+    {
+
+        Ref_GamePlayManager.SwapCard(GetCard(obj1), GetCard(obj2));
+        LoadSprit(obj1, GetCard(obj1));
+        LoadSprit(obj2, GetCard(obj2));
+
+    }
+
+
+    public void DeHighLiteCard(List<Card> cards)
+    {
+        for (int i = 0; i < cards.Count; i++)
+        {
+            GetImage_Sorce(cards[i].gameObject).color = W_Color;
+        }
+    }
+
+
+    public void TabelSetActive(bool active) 
+    {
+        Tabel.gameObject.SetActive(active);
+    }
+    public void HedarParentSetActive(bool active)
+    {
+        HaderParent.gameObject.SetActive(active);
+    }
+
+    public void StopWatch(int Seconds)
+    {
+        int mm = Seconds / 60;
+        int ss = Seconds-(mm*60);
+        SetStopWatch_Text(mm,ss);
+    }
+
+    public void GameSatrt()
+    {
+        ChageAllBg();
+        Partical_Parent.SetActive(false);
+        WinTextSetActive(false);
+        start(false);
+        TabelSetActive(false);
+        HedarParentSetActive(false);
+        CounDowan(true);
+    }
+    public void GameOver(string text,bool IsPaticl=false)
+    {
+        WinText.GetComponent<TextMeshProUGUI>().text = text;
+        if (IsPaticl) { Partical_Parent.SetActive(true); }
+        WinTextSetActive(true);
+        TabelSetActive(false);
+        HedarParentSetActive(false);
+    }
+
+    public void WinTextSetActive(bool active)
+    {
+        WinText.SetActive(active);
+    }
+
+    public void ChageAllBg()
+    {
+        GetImage_Sorce1().color = G_Color;
+        GetImage_Sorce2().color = G_Color;
+        GetImage_Sorce3().color = G_Color;
+    }
+    #endregion
+
 }
